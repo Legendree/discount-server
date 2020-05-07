@@ -1,15 +1,20 @@
 const express = require('express');
-const asyncHandler = require('express-async-handler');
+
 const Sale = require('../models/Sale');
+
 const ErrorResponse = require('../utils/errorResponse');
+
+const asyncHandler = require('express-async-handler');
+const advanceQuery = require('../middleware/advancedQuery')
+
 
 const router = express.Router();
 
 router.get(
   '/',
+  advanceQuery(Sale),
   asyncHandler(async (req, res, next) => {
-    const sales = await Sale.find();
-    res.status(200).json({ success: true, data: sales });
+    res.status(200).json({ success: true, count: res.advancedResult.length, data: res.advancedResult });
   })
 );
 
