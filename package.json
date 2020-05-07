@@ -1,0 +1,23 @@
+{
+  "name": "discount-server",
+  "version": "1.0.0",
+  "description": "Aplication Programming Interface for the Discount app available on Appstore and Play Market",
+  "main": "server",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server",
+    "prod": "NODE_ENV=production node server"
+  },
+  "author": "Denis Polupan",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
+    "helmet": "^3.22.0",
+    "mongoose": "^5.9.12",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.3"
+  }
+}
