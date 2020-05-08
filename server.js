@@ -1,7 +1,7 @@
 // Express require
 const express = require('express');
 const app = express();
-const rateLimit = require('express-rate-limit')
+const rateLimit = require('express-rate-limit');
 
 const mongoSenitize = require('express-mongo-sanitize');
 
@@ -18,6 +18,7 @@ const errorHandler = require('./middleware/errorHandler');
 
 // Routes require
 const posts = require('./routes/posts');
+const auth = require('./routes/auth');
 
 // Database connection require
 const connectDb = require('./config/db');
@@ -37,8 +38,8 @@ if (process.env.NODE_ENV === 'development') {
 
 const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 250
-})
+  max: 250,
+});
 
 app.use(apiLimiter);
 // Set security headers
@@ -57,6 +58,7 @@ connectDb();
 
 // Routes
 app.use('/v1/api/posts', posts);
+app.use('/v1/api/auth', auth);
 
 // Error handling
 app.use(errorHandler);
