@@ -26,18 +26,18 @@ router.post(
   asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
 
-    //VALIDATE EMAIL AND PASSWORD
+    // Validate email and password
     if (!email || !password)
       return next(new ErrorResponse('Please enter email and password', 400));
 
-    //CHECK FOR USER
+    // Check for user
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
       return next(new ErrorResponse('Invalid email or password', 401));
     }
 
-    //CHECK IF PASSWORD MATCHES
+    // Check if password matches
     const isMatch = await user.matchPassword(password);
     if (!isMatch)
       return next(new ErrorResponse('Invalid email or password', 401));
@@ -58,7 +58,7 @@ router.get(
   })
 );
 
-//GET TOKEN FROM MODEL , CREATE COOKIE
+// Get token form model, and add as a cookie
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
 
