@@ -48,8 +48,7 @@ app.use(xss());
 // Prevent HTTP polution
 app.use(hpp());
 // Senitize mongo injections
-app.use(mongoSenitize());
-
+app.use(mongoSenitize()); 
 // Express essentials
 app.use(express.json());
 
