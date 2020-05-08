@@ -1,6 +1,6 @@
 const express = require('express');
 
-const Sale = require('../models/Sale');
+const Post = require('../models/Posts');
 
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get(
   '/',
-  advanceQuery(Sale),
+  advanceQuery(Post),
   asyncHandler(async (req, res, next) => {
     res.status(200).json({ success: true, count: res.advancedResult.length, data: res.advancedResult });
   })
@@ -21,11 +21,11 @@ router.get(
 router.get(
   '/:id',
   asyncHandler(async (req, res, next) => {
-    const sale = await Sale.findById(req.params.id);
-    if (!sale) return next(new ErrorResponse('Sale not found', 404));
+    const Post = await Post.findById(req.params.id);
+    if (!Post) return next(new ErrorResponse('Post not found', 404));
     res.status(200).json({
       success: true,
-      data: sale,
+      data: Post,
     });
   })
 );
@@ -33,29 +33,29 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req, res, next) => {
-    const sale = await Sale.create(req.body);
+    const Post = await Post.create(req.body);
     res.status(200).json({
       success: true,
-      data: sale,
+      data: Post,
     });
   })
 );
 
 router.put('/:id', async (req, res, next) => {
-  const sale = await Sale.findByIdAndUpdate(req.params.id, req.body, {
+  const Post = await Post.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-  if (!sale) return next(new ErrorResponse('Sale not found', 404));
+  if (!Post) return next(new ErrorResponse('Post not found', 404));
   res.status(200).json({
     success: true,
-    data: sale,
+    data: Post,
   });
 });
 
 router.delete('/:id', async (req, res, next) => {
-  const sale = await Sale.findByIdAndDelete(req.params.id);
-  if (!sale) return next(new ErrorResponse('Sale not found', 404));
+  const Post = await Post.findByIdAndDelete(req.params.id);
+  if (!Post) return next(new ErrorResponse('Post not found', 404));
   res.status(200).json({
     success: true,
     data: {},

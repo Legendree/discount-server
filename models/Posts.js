@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 
-const saleSchema = new mongoose.Schema({
+const postSchema = new mongoose.Schema({
     storeName: {
         type: String,
         minlength: 2,
@@ -30,4 +30,4 @@ const saleSchema = new mongoose.Schema({
     storeColor: Number,
 })
 
-module.exports = mongoose.model('Sale', saleSchema);
+module.exports = mongoose.model('Post', postSchema);
