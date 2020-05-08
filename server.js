@@ -8,7 +8,7 @@ const morgan = require('morgan');
 const errorHandler = require('./middleware/errorHandler');
 
 // Routes require
-const sales = require('./routes/sales');
+const posts = require('./routes/posts');
 
 // Database connection require
 const connectDb = require('./config/db');
@@ -25,7 +25,7 @@ connectDb();
 
 app.use(express.json());
 
-app.use('/v1/api/sales', sales);
+app.use('/v1/api/posts', posts);
 
 app.use(errorHandler);
 
