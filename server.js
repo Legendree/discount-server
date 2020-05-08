@@ -1,10 +1,19 @@
+// Express require
 const express = require('express');
 const app = express();
+const rateLimit = require('express-rate-limit')
+
+const mongoSenitize = require('express-mongo-sanitize');
+
+// App security require
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 
-//get error handler
+// Error handler require
 const errorHandler = require('./middleware/errorHandler');
 
 // Routes require
@@ -13,20 +22,44 @@ const posts = require('./routes/posts');
 // Database connection require
 const connectDb = require('./config/db');
 
+// Coloring for the console output
 require('colors');
 
+// Config setup
 dotenv.config({ path: './config/config.env' });
-
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-connectDb();
+/// Middleware
+// Rate limiting for the api call
+// app.set('trust proxy', 1); // Should be enabled when behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
 
+const apiLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 250
+})
+
+app.use(apiLimiter);
+// Set security headers
+app.use(helmet());
+// Prevent possible XSS attacks
+app.use(xss());
+// Prevent HTTP polution
+app.use(hpp());
+// Senitize mongo injections
+app.use(mongoSenitize());
+
+// Express essentials
 app.use(express.json());
 
+// Connecting to db after security is established above
+connectDb();
+
+// Routes
 app.use('/v1/api/posts', posts);
 
+// Error handling
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
