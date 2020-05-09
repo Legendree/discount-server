@@ -44,3 +44,7 @@ module.exports = (model, populate) => async (req, res, next) => {
     res.advancedResult = result;
     next();
 }
+
+
+// All of the queries are usable like this:
+// ?select=storeName,expiresAt,storeColor&?keywords=castro+pullandbear+adika&?sort=storeName
