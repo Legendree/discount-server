@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/user');
 const ErrorResponse = require('../utils/errorResponse');
 const role = require('../middleware/role');
+const sendEmail = require('../utils/sendemail');
 
 const router = express.Router();
 
@@ -61,7 +62,7 @@ router.get(
 router.post(
   '/forgotpassword',
   asyncHandler(async (req, res, next) => {
-    const user = User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email });
     if (!user) next(new ErrorResponse('Invalid Email', 400));
 
     //Get reset token
@@ -80,7 +81,7 @@ router.post(
       await sendEmail({
         email: user.email,
         subject: 'Discount - Reset your password',
-        html: `<p style=font-size:12px; color:MediumSeaGreen;><b>${message}</b></p>`,
+        html: `<p style="font-size:12px; color:MediumSeaGreen;"><b>${message}</b></p>`,
       });
       res.json({
         success: true,
