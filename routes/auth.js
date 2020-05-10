@@ -75,7 +75,7 @@ router.post(
       'host'
     )}/api/v1/auth/resetpassword/${resetToken}`;
 
-    const message = `You are recieving this email because you or someone else has requested to reset your password, please make a put request to \n\n ${resetUrl}`;
+    const message = `You are recieving this email because you or someone else has requested to reset your password, please make a put request to \n\n <a href=${resetUrl}>${resetUrl}</a>`;
 
     try {
       await sendEmail({
