@@ -3,7 +3,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/user');
 
-exports.protect = asyncHandler(async (req, res, next) => {
+module.exports = asyncHandler(async (req, res, next) => {
   let token;
 
   if (

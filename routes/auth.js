@@ -2,6 +2,8 @@ const express = require('express');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/user');
 const ErrorResponse = require('../utils/errorResponse');
+const auth = require('../middleware/auth');
+
 const role = require('../middleware/role');
 
 const router = express.Router();
@@ -48,7 +50,7 @@ router.post(
 
 router.get(
   '/profile',
-  role(['user']),
+  [auth],
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
     res.json({
