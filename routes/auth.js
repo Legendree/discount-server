@@ -5,6 +5,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 const sendEmail = require('../utils/sendemail');
+const crypto = require('crypto');
 
 const router = express.Router();
 
@@ -97,6 +98,31 @@ router.post(
 
       return next(new ErrorResponse('Email could not be sent', 500));
     }
+  })
+);
+
+router.post(
+  '/resetpassword/:resettoken',
+  asyncHandler(async (req, res, next) => {
+    //Get reset password token
+    const resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(req.params.resettoken)
+      .digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+    if (!user) return next(new ErrorResponse('Invalid reset password link'));
+
+    //Set new password
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    sendTokenResponse(user, 200, res);
   })
 );
 
