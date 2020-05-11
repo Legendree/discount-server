@@ -126,6 +126,27 @@ router.post(
   })
 );
 
+router.put(
+  '/updateinfo',
+  [auth, role('user')],
+  asyncHandler(async (req, res, next) => {
+    const fieldsToUpdate = {
+      name: req.body.name,
+      email: req.body.email,
+    };
+
+    const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.json({
+      success: true,
+      date: user,
+    });
+  })
+);
+
 // Get token form model, and add as a cookie
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
