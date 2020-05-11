@@ -6,9 +6,6 @@ module.exports = (...role) =>
     if (role.includes(req.user.role)) next();
     else
       return next(
-        new ErrorResponse(
-          `You are not an authorized user, you are a ${req.user.role}`,
-          401
-        )
+        new ErrorResponse(`You are not authorized to access this route`, 401)
       );
   });
