@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 
 const mongoSenitize = require('express-mongo-sanitize');
 
@@ -49,9 +50,11 @@ app.use(xss());
 // Prevent HTTP polution
 app.use(hpp());
 // Senitize mongo injections
-app.use(mongoSenitize()); 
+app.use(mongoSenitize());
 // Express essentials
 app.use(express.json());
+//Cookie parser
+app.use(cookieParser());
 
 // Connecting to db after security is established above
 connectDb();
