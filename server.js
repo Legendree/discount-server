@@ -20,6 +20,7 @@ const errorHandler = require('./middleware/errorHandler');
 // Routes require
 const posts = require('./routes/posts');
 const auth = require('./routes/auth');
+const user = require('./routes/users');
 
 // Database connection require
 const connectDb = require('./config/db');
@@ -53,7 +54,7 @@ app.use(hpp());
 app.use(mongoSenitize());
 // Express essentials
 app.use(express.json());
-//Cookie parser
+// Cookie parser
 app.use(cookieParser());
 
 // Connecting to db after security is established above
@@ -62,6 +63,7 @@ connectDb();
 // Routes
 app.use('/v1/api/posts', posts);
 app.use('/v1/api/auth', auth);
+app.use('/v1/api/users', user);
 
 // Error handling
 app.use(errorHandler);
