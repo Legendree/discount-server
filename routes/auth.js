@@ -163,6 +163,21 @@ router.put(
   })
 );
 
+router.get(
+  '/logout',
+  [auth, role('user')],
+  asyncHandler(async (req, res, next) => {
+    res.cookie('token', 'none', {
+      expires: new Date(Date.now + 10 * 1000),
+      httpOnly: true,
+    });
+    res.json({
+      success: true,
+      date: {},
+    });
+  })
+);
+
 // Get token form model, and add as a cookie
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
