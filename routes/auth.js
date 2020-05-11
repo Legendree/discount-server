@@ -147,6 +147,22 @@ router.put(
   })
 );
 
+router.put(
+  '/updatepassword',
+  [auth, role('user')],
+  asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select('+password');
+
+    if (!(await user.matchPassword(req.body.currentPassword)))
+      return next(new ErrorResponse('Password is incorrect', 401));
+
+    user.password = req.body.newPassword;
+    await user.save();
+
+    sendTokenResponse(user, 200, res);
+  })
+);
+
 // Get token form model, and add as a cookie
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
