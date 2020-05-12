@@ -7,6 +7,11 @@ const postSchema = new mongoose.Schema({
         maxlength: 16,
         required: true
     },
+    category: {
+        type: String,
+        enum: ['clothing', 'accessories', 'food', 'electronics', 'beauty'],
+        required: [true, 'Pleaese select one of the categories for this stores discount']
+    },
     description: {
         type: String,
         minlength: 5,

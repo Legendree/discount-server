@@ -7,8 +7,15 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('express-async-handler');
 const advanceQuery = require('../middleware/advancedQuery');
 
+const auth = require('../middleware/auth');
+const role = require('../middleware/role');
+
 const router = express.Router();
 
+
+// @desc    Get all available posts
+// @route   GET /api/v1/posts
+// @access  Public
 router.get(
   '/',
   advanceQuery(Post),
@@ -21,6 +28,9 @@ router.get(
   })
 );
 
+// @desc    Get available post by id
+// @route   GET /api/v1/posts/:id
+// @access  Public
 router.get(
   '/:id',
   asyncHandler(async (req, res, next) => {
@@ -33,8 +43,12 @@ router.get(
   })
 );
 
+// @desc    Create a new post
+// @route   POST /api/v1/posts
+// @access  Private
 router.post(
   '/',
+  [auth, role('user')],
   asyncHandler(async (req, res, next) => {
     const post = await Post.create(req.body);
     res.status(200).json({
