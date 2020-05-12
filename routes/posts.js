@@ -10,6 +10,8 @@ const advanceQuery = require('../middleware/advancedQuery');
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 
+const path = require('path');
+
 const router = express.Router();
 
 // @desc    Get all available posts
@@ -92,27 +94,17 @@ router.put(
   asyncHandler(async (req, res, next) => {
     const post = await Post.findById(req.params.id);
     if (!post) next(new ErrorResponse('The post does not exist', 404));
-
     if (!req.files) next(new ErrorResponse('Please add a photo', 400));
-
     const file = req.files.file;
     // Make sure image is a photo
-    if (!file.mimetype.startsWith('image')) {
-      return next(new ErrorResponse('Please upload an image file', 400));
-    }
-    file.name = `photo_${post._id}${path.parse(file.name).ext}`;
+    if (!file.mimetype.startsWith('image')) return next(new ErrorResponse('Please upload an image file', 400));
+    if (file.size > process.env.MAX_FILE_UPLOAD) return next(new ErrorResponse(`Please upload image less then 1MB`, 400));
+    if (path.contain) file.name = `photo_${post._id}${path.parse(file.name).ext}`;
+
     file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
-      if (err) {
-        console.log(err);
-        return next(new ErrorResponse('Problem with file upload', 500));
-      }
-
+      if (err) return next(new ErrorResponse('Problem with file upload', 500));
       await Post.findByIdAndUpdate(req.params.id, { image: file.name });
-
-      res.json({
-        success: true,
-        data: file.name,
-      });
+      res.json({ success: true, data: file.name });
     });
   })
 );

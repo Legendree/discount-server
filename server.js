@@ -2,9 +2,12 @@
 const express = require('express');
 const app = express();
 const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
-
 const mongoSenitize = require('express-mongo-sanitize');
+const fileUpload = require('express-fileupload');
+
+const path = require('path');
+
+const cookieParser = require('cookie-parser');
 
 // App security require
 const helmet = require('helmet');
@@ -54,8 +57,13 @@ app.use(hpp());
 app.use(mongoSenitize());
 // Express essentials
 app.use(express.json());
+// File upload feature
+app.use(fileUpload());
 // Cookie parser
 app.use(cookieParser());
+
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Connecting to db after security is established above
 connectDb();
