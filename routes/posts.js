@@ -128,9 +128,8 @@ router.put(
   auth,
   asyncHandler(async (req, res, next) => {
     const post = await Post.findById(req.params.id).populate('usersLiked');
-    post.usersLiked.forEach(userLiked => {
-      if (userLiked._id.toString() === req.user._id.toString()) return next(new ErrorResponse('You already liked this post', 400));
-    });
+    const like = post.usersLiked.find(userLiked => userLiked._id.toString() === req.user._id.toString());
+    if (like) return next(new ErrorResponse('You already liked this post', 400));
     post.usersLiked.push(req.user._id);
     await post.save();
     res.status(200).json({ success: true, likeCount: post });
