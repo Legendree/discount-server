@@ -95,20 +95,25 @@ router.put(
   asyncHandler(async (req, res, next) => {
     const post = await Post.findById(req.params.id);
     if (!post) return next(new ErrorResponse('The post does not exist', 404));
+    // Check if an image exists and delete it
     if (post.image) {
       let photoPath = __dirname;
       photoPath = photoPath.substr(0, photoPath.length - 7);
-      fs.unlink(`${photoPath}/public/uploads/${post.image}`,
-        err => {
-          if (err) return next(new ErrorResponse('Something went wrong', 500))
-        });
+      fs.unlink(`${photoPath}/public/uploads/${post.image}`, (err) => {
+        if (err) return next(new ErrorResponse('Something went wrong', 500));
+      });
     }
+
     if (!req.files) return next(new ErrorResponse('Please add a photo', 400));
     const file = req.files.file;
     // Make sure image is a photo
-    if (!file.mimetype.startsWith('image')) return next(new ErrorResponse('Please upload an image file', 400));
-    if (file.size > process.env.MAX_FILE_UPLOAD) return next(new ErrorResponse(`Please upload image less then 1MB`, 400));
-    file.name = `photo_${post.storeName}_${Date.now()}${path.parse(file.name).ext}`;
+    if (!file.mimetype.startsWith('image'))
+      return next(new ErrorResponse('Please upload an image file', 400));
+    if (file.size > process.env.MAX_FILE_UPLOAD)
+      return next(new ErrorResponse(`Please upload image less then 1MB`, 400));
+    file.name = `photo_${post.storeName}_${Date.now()}${
+      path.parse(file.name).ext
+    }`;
 
     file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
       if (err) return next(new ErrorResponse('Problem with file upload', 500));
