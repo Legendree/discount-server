@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  favoritePosts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'posts',
+    },
+  ],
 });
 
 // Encrypt password
