@@ -35,12 +35,10 @@ const postSchema = new mongoose.Schema({
     required: [true, 'Please enter experation date for this sale'],
   },
   storeColor: Number,
-  likes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
-    },
-  ],
+  usersLiked: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
 });
 
 module.exports = mongoose.model('Post', postSchema);

@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
   favoritePosts: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'posts',
+      ref: 'Post',
     },
   ],
 });

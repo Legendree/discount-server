@@ -113,13 +113,27 @@ router.put(
       return next(new ErrorResponse(`Please upload image less then 1MB`, 400));
     file.name = `photo_${post.storeName}_${Date.now()}${
       path.parse(file.name).ext
-    }`;
+      }`;
 
     file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
       if (err) return next(new ErrorResponse('Problem with file upload', 500));
       await Post.findByIdAndUpdate(req.params.id, { image: file.name });
       res.json({ success: true, data: file.name });
     });
+  })
+);
+
+router.put(
+  '/:id/like',
+  auth,
+  asyncHandler(async (req, res, next) => {
+    const post = await Post.findById(req.params.id).populate('usersLiked');
+    post.usersLiked.forEach(userLiked => {
+      if (userLiked._id.toString() === req.user._id.toString()) return next(new ErrorResponse('You already liked this post', 400));
+    });
+    post.usersLiked.push(req.user._id);
+    await post.save();
+    res.status(200).json({ success: true, likeCount: post });
   })
 );
 

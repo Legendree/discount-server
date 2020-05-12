@@ -90,7 +90,7 @@ router.post(
         data: 'Check out your Email son',
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
 
