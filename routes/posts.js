@@ -98,10 +98,11 @@ router.put(
     const post = await Post.findById(req.params.id);
     if (!post) return next(new ErrorResponse('The post does not exist', 404));
     // Check if an image exists and delete it
-    if (post.image) {
-      let photoPath = __dirname;
-      photoPath = photoPath.substr(0, photoPath.length - 7);
-      fs.unlink(`${photoPath}/public/uploads/${post.image}`, (err) => {
+    let photoPath = __dirname;
+    photoPath = photoPath.substr(0, photoPath.length - 7);
+    console.log(post.image);
+    if (post.image && post.image !== 'no-image.jpg') {
+      fs.unlink(post.image, (err) => {
         if (err) return next(new ErrorResponse('Something went wrong', 500));
       });
     }
@@ -119,7 +120,7 @@ router.put(
 
     file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
       if (err) return next(new ErrorResponse('Problem with file upload', 500));
-      await Post.findByIdAndUpdate(req.params.id, { image: file.name });
+      await Post.findByIdAndUpdate(req.params.id, { image: `${photoPath}/public/uploads/${file.name}` });
       res.json({ success: true, data: file.name });
     });
   })
