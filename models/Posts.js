@@ -39,6 +39,11 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  likeCount: Number,
 });
+
+postSchema.pre('save', function () {
+  this.likeCount = this.usersLiked.length;
+})
 
 module.exports = mongoose.model('Post', postSchema);
