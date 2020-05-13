@@ -178,6 +178,22 @@ router.get(
   })
 );
 
+router.get(
+  '/favorites',
+  auth,
+  asyncHandler(async (req, res, next) => {
+    const favorites = await User.findById(req.user.id).populate({
+      path: 'favoritePosts',
+      select: 'storeName image',
+    });
+    if (!favorites) return next(new ErrorResponse('No favorites', 404));
+    res.status(200).json({
+      success: true,
+      data: favorites,
+    });
+  })
+);
+
 // Get token form model, and add as a cookie
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
