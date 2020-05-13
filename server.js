@@ -2,12 +2,10 @@
 const express = require('express');
 const app = express();
 const rateLimit = require('express-rate-limit');
-const mongoSenitize = require('express-mongo-sanitize');
-const fileUpload = require('express-fileupload');
-
-const path = require('path');
-
 const cookieParser = require('cookie-parser');
+const fileupload = require('express-fileupload');
+
+const mongoSenitize = require('express-mongo-sanitize');
 
 // App security require
 const helmet = require('helmet');
@@ -24,6 +22,7 @@ const errorHandler = require('./middleware/errorHandler');
 const posts = require('./routes/posts');
 const auth = require('./routes/auth');
 const user = require('./routes/users');
+const comments = require('./routes/comments');
 
 // Database connection require
 const connectDb = require('./config/db');
@@ -57,13 +56,10 @@ app.use(hpp());
 app.use(mongoSenitize());
 // Express essentials
 app.use(express.json());
-// File upload feature
-app.use(fileUpload());
 // Cookie parser
 app.use(cookieParser());
-
-// Set static folder
-app.use(express.static(path.join(__dirname, 'public')));
+// File upload
+app.use(fileupload());
 
 // Connecting to db after security is established above
 connectDb();
@@ -72,6 +68,7 @@ connectDb();
 app.use('/v1/api/posts', posts);
 app.use('/v1/api/auth', auth);
 app.use('/v1/api/users', user);
+app.use('/v1/api/comments', comments);
 
 // Error handling
 app.use(errorHandler);

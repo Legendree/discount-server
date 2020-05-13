@@ -15,6 +15,8 @@ const fs = require('fs');
 
 const router = express.Router();
 
+router.use('/:postId/comments', require('./comments'));
+
 // @desc    Get all available posts
 // @route   GET /api/v1/posts
 // @access  Public
