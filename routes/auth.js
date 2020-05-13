@@ -182,14 +182,15 @@ router.get(
   '/favorites',
   auth,
   asyncHandler(async (req, res, next) => {
-    const favorites = await User.findById(req.user.id).populate({
+    const user = await User.findById(req.user.id).populate({
       path: 'favoritePosts',
       select: 'storeName image',
     });
-    if (!favorites) return next(new ErrorResponse('No favorites', 404));
+    if (user.favoritePosts === undefined || user.favoritePosts.length == 0)
+      return next(new ErrorResponse('No favorites', 404));
     res.status(200).json({
       success: true,
-      data: favorites,
+      data: user.favoritePosts,
     });
   })
 );
