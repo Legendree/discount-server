@@ -145,7 +145,7 @@ router.put(
     // Add to user favorites
     user.favoritePosts.push(req.params.id);
     await post.save();
-    await user.save({ runValidators: false });
+    await user.save({ validateBeforeSave: false });
     res.status(200).json({ success: true, data: post });
   })
 );
@@ -170,7 +170,7 @@ router.put(
       post.usersLiked.splice(postIndex, 1);
     } else return next(new ErrorResponse('You already unliked this post', 400));
     await post.save();
-    await user.save({ runValidators: false });
+    await user.save({ validateBeforeSave: false });
     res.status(200).json({ success: true, data: post });
   })
 );

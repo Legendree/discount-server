@@ -4,6 +4,8 @@ module.exports = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
 
+  console.log(err.stack);
+
   // Mongoose duplicate key
   if (err.code === 11000) {
     const message = `This name is already used, please use other name`;
