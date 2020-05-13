@@ -51,7 +51,7 @@ router.post(
 
 router.get(
   '/profile',
-  [auth, role('user')],
+  auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
     res.json({
