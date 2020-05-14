@@ -59,7 +59,7 @@ router.post(
     const { storeName, description, category, expiresAt, storeColor, image } = req.body;
     const post = await Post.create({ storeName, description, category, expiresAt, storeColor });
     const ext = path.extname(image);
-    if (ext !== '.png' || ext !== '.jpg') return next(new ErrorResponse('File format is not supported', 400));
+    if (ext !== '.png' && ext !== '.jpg') return next(new ErrorResponse('File format is not supported', 400));
     const upload = await uploadPhoto({ location: image, name: `${Date.now()}_${storeName}_${post._id}${ext}` });
     post.image = upload.Location;
     await post.save();
