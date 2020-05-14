@@ -8,11 +8,12 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('express-async-handler');
 const advanceQuery = require('../middleware/advancedQuery');
 
+const { uploadPhoto } = require('../middleware/uploadPhoto');
+
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 
 const path = require('path');
-const fs = require('fs');
 
 const router = express.Router();
 
@@ -55,7 +56,13 @@ router.post(
   '/',
   [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
-    const post = await Post.create(req.body);
+    const { storeName, description, category, expiresAt, storeColor, image } = req.body;
+    const post = await Post.create({ storeName, description, category, expiresAt, storeColor });
+    const ext = path.extname(image);
+    console.log(`${Date.now()}_${storeName}_${post._id}`);
+    const upload = await uploadPhoto({ location: image, name: `${Date.now()}_${storeName}_${post._id}${ext}` });
+    post.image = upload.Location;
+    await post.save();
     res.status(200).json({
       success: true,
       data: post,
@@ -92,42 +99,6 @@ router.delete(
   })
 );
 
-router.put(
-  '/:id/photo',
-  [auth, role('admin')],
-  asyncHandler(async (req, res, next) => {
-    const post = await Post.findById(req.params.id);
-    if (!post) return next(new ErrorResponse('The post does not exist', 404));
-    // Check if an image exists and delete it
-    let photoPath = __dirname;
-    photoPath = photoPath.substr(0, photoPath.length - 7);
-    console.log(post.image);
-    if (post.image && post.image !== 'no-image.jpg') {
-      fs.unlink(post.image, (err) => {
-        if (err) return next(new ErrorResponse('Something went wrong', 500));
-      });
-    }
-
-    if (!req.files) return next(new ErrorResponse('Please add a photo', 400));
-    const file = req.files.file;
-    // Make sure image is a photo
-    if (!file.mimetype.startsWith('image'))
-      return next(new ErrorResponse('Please upload an image file', 400));
-    if (file.size > process.env.MAX_FILE_UPLOAD)
-      return next(new ErrorResponse(`Please upload image less then 1MB`, 400));
-    file.name = `photo_${post.storeName}_${Date.now()}${
-      path.parse(file.name).ext
-    }`;
-
-    file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
-      if (err) return next(new ErrorResponse('Problem with file upload', 500));
-      await Post.findByIdAndUpdate(req.params.id, {
-        image: path.join(photoPath, `/public/uploads/${file.name}`),
-      });
-      res.json({ success: true, data: file.name });
-    });
-  })
-);
 
 router.put(
   '/:id/like',
