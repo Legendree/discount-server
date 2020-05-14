@@ -117,11 +117,13 @@ router.put(
       return next(new ErrorResponse(`Please upload image less then 1MB`, 400));
     file.name = `photo_${post.storeName}_${Date.now()}${
       path.parse(file.name).ext
-      }`;
+    }`;
 
     file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
       if (err) return next(new ErrorResponse('Problem with file upload', 500));
-      await Post.findByIdAndUpdate(req.params.id, { image: path.join(photoPath, `/public/uploads/${file.name}`) });
+      await Post.findByIdAndUpdate(req.params.id, {
+        image: path.join(photoPath, `/public/uploads/${file.name}`),
+      });
       res.json({ success: true, data: file.name });
     });
   })
@@ -138,29 +140,6 @@ router.put(
     const like = post.usersLiked.find(
       (userLiked) => userLiked._id.toString() === req.user._id.toString()
     );
-    if (like)
-      return next(new ErrorResponse('You already liked this post', 400));
-    // Like the post
-    post.usersLiked.push(req.user._id);
-    // Add to user favorites
-    user.favoritePosts.push(req.params.id);
-    await post.save();
-    await user.save({ validateBeforeSave: false });
-    res.status(200).json({ success: true, data: post });
-  })
-);
-
-router.put(
-  '/:id/unlike',
-  auth,
-  asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.user._id);
-    if (!user) return next(new ErrorResponse('You are not logged in', 404));
-
-    const post = await Post.findById(req.params.id).populate('usersLiked');
-    const like = post.usersLiked.find(
-      (userLiked) => userLiked._id.toString() === req.user._id.toString()
-    );
     if (like) {
       // Remove post from favoritesPosts array
       const userIndex = user.favoritePosts.indexOf(req.user._id);
@@ -168,11 +147,41 @@ router.put(
       // Remove like from usersLiked array
       const postIndex = post.usersLiked.indexOf(req.params.id);
       post.usersLiked.splice(postIndex, 1);
-    } else return next(new ErrorResponse('You already unliked this post', 400));
+    } else {
+      // Like the post
+      post.usersLiked.push(req.user._id);
+      // Add to user favorites
+      user.favoritePosts.push(req.params.id);
+    }
     await post.save();
     await user.save({ validateBeforeSave: false });
     res.status(200).json({ success: true, data: post });
   })
 );
+
+// router.put(
+//   '/:id/unlike',
+//   auth,
+//   asyncHandler(async (req, res, next) => {
+//     const user = await User.findById(req.user._id);
+//     if (!user) return next(new ErrorResponse('You are not logged in', 404));
+
+//     const post = await Post.findById(req.params.id).populate('usersLiked');
+//     const like = post.usersLiked.find(
+//       (userLiked) => userLiked._id.toString() === req.user._id.toString()
+//     );
+//     if (like) {
+//       // Remove post from favoritesPosts array
+//       const userIndex = user.favoritePosts.indexOf(req.user._id);
+//       user.favoritePosts.splice(userIndex, 1);
+//       // Remove like from usersLiked array
+//       const postIndex = post.usersLiked.indexOf(req.params.id);
+//       post.usersLiked.splice(postIndex, 1);
+//     } else return next(new ErrorResponse('You already unliked this post', 400));
+//     await post.save();
+//     await user.save({ validateBeforeSave: false });
+//     res.status(200).json({ success: true, data: post });
+//   })
+// );
 
 module.exports = router;
