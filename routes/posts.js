@@ -8,7 +8,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('express-async-handler');
 const advanceQuery = require('../middleware/advancedQuery');
 
-const { uploadPhoto } = require('../middleware/uploadPhoto');
+const { uploadPhoto, deletePhoto } = require('../middleware/imageManager');
 
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
@@ -60,7 +60,6 @@ router.post(
     const post = await Post.create({ storeName, description, category, expiresAt, storeColor });
     const ext = path.extname(image);
     if (ext !== '.png' || ext !== '.jpg') return next(new ErrorResponse('File format is not supported', 400));
-    console.log(`${Date.now()}_${storeName}_${post._id}`);
     const upload = await uploadPhoto({ location: image, name: `${Date.now()}_${storeName}_${post._id}${ext}` });
     post.image = upload.Location;
     await post.save();
@@ -91,8 +90,10 @@ router.delete(
   '/:id',
   [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
-    const post = await Post.findByIdAndDelete(req.params.id);
+    const post = await Post.findById(req.params.id);
     if (!post) return next(new ErrorResponse('Post not found', 404));
+    if (post.image) await deletePhoto(post.image)
+    await post.remove();
     res.status(200).json({
       success: true,
       data: {},
