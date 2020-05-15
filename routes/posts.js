@@ -138,10 +138,12 @@ router.put(
     if (like && favorites) {
       // Remove post from favoritesPosts array
       const userIndex = user.favoritePosts.indexOf(req.params.id);
-      user.favoritePosts.splice(userIndex, 1);
+      if (userIndex >= 0)
+        user.favoritePosts.splice(userIndex, 1);
       // Remove like from usersLiked array
       const postIndex = post.usersLiked.indexOf(req.user._id);
-      post.usersLiked.splice(postIndex, 1);
+      if (postIndex >= 0)
+        post.usersLiked.splice(postIndex, 1);
     } else {
       // Like the post
       if (!like) post.usersLiked.push(req.user._id);
