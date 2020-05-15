@@ -146,9 +146,11 @@ router.put(
         post.usersLiked.splice(postIndex, 1);
     } else {
       // Like the post
-      post.usersLiked.push(req.user._id);
+      if (!like)
+        post.usersLiked.push(req.user._id);
       // Add to user favorites
-      user.favoritePosts.push(req.params.id);
+      if (!favorites)
+        user.favoritePosts.push(req.params.id);
     }
     await post.save();
     await user.save({ validateBeforeSave: false });
