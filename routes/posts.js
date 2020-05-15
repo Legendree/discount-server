@@ -56,11 +56,28 @@ router.post(
   '/',
   [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
-    const { storeName, description, category, expiresAt, storeColor, image } = req.body;
-    const post = await Post.create({ storeName, description, category, expiresAt, storeColor });
+    const {
+      storeName,
+      description,
+      category,
+      expiresAt,
+      storeColor,
+      image,
+    } = req.body;
+    const post = await Post.create({
+      storeName,
+      description,
+      category,
+      expiresAt,
+      storeColor,
+    });
     const ext = path.extname(image);
-    if (ext !== '.png' && ext !== '.jpg') return next(new ErrorResponse('File format is not supported', 400));
-    const upload = await uploadPhoto({ location: image, name: `${Date.now()}_${storeName}_${post._id}${ext}` });
+    if (ext !== '.png' && ext !== '.jpg')
+      return next(new ErrorResponse('File format is not supported', 400));
+    const upload = await uploadPhoto({
+      location: image,
+      name: `${Date.now()}_${storeName}_${post._id}${ext}`,
+    });
     post.image = upload.Location;
     await post.save();
     res.status(200).json({
@@ -92,7 +109,7 @@ router.delete(
   asyncHandler(async (req, res, next) => {
     const post = await Post.findById(req.params.id);
     if (!post) return next(new ErrorResponse('Post not found', 404));
-    if (post.image) await deletePhoto(post.image)
+    if (post.image) await deletePhoto(post.image);
     await post.remove();
     res.status(200).json({
       success: true,
@@ -100,7 +117,6 @@ router.delete(
     });
   })
 );
-
 
 router.put(
   '/:id/like',
@@ -110,6 +126,7 @@ router.put(
     if (!user) return next(new ErrorResponse('You are not logged in', 404));
 
     const post = await Post.findById(req.params.id).populate('usersLiked');
+    if (!post) return next(new ErrorResponse('Post not found', 404));
     const like = post.usersLiked.find(
       (userLiked) => userLiked._id.toString() === req.user._id.toString()
     );
