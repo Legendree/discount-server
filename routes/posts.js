@@ -132,16 +132,18 @@ router.put(
       (userLiked) => userLiked._id.toString() === req.user._id.toString()
     );
     const favorites = user.favoritePosts.find(
-      (favoritePost) => favoritePost._id.toString() === req.params.id.toString()
+      (favoritePost) => favoritePost.toString() === req.params.id.toString()
     );
 
-    if (like && favorites) {
+    if (like || favorites) {
       // Remove post from favoritesPosts array
-      const userIndex = user.favoritePosts.indexOf(req.user._id);
-      user.favoritePosts.splice(userIndex, 1);
+      const userIndex = user.favoritePosts.indexOf(req.params.id);
+      if (userIndex)
+        user.favoritePosts.splice(userIndex, 1);
       // Remove like from usersLiked array
-      const postIndex = post.usersLiked.indexOf(req.params.id);
-      post.usersLiked.splice(postIndex, 1);
+      const postIndex = post.usersLiked.indexOf(req.user._id);
+      if (postIndex)
+        post.usersLiked.splice(postIndex, 1);
     } else {
       // Like the post
       post.usersLiked.push(req.user._id);
