@@ -138,19 +138,15 @@ router.put(
     if (like && favorites) {
       // Remove post from favoritesPosts array
       const userIndex = user.favoritePosts.indexOf(req.params.id);
-      if (userIndex)
-        user.favoritePosts.splice(userIndex, 1);
+      user.favoritePosts.splice(userIndex, 1);
       // Remove like from usersLiked array
       const postIndex = post.usersLiked.indexOf(req.user._id);
-      if (postIndex)
-        post.usersLiked.splice(postIndex, 1);
+      post.usersLiked.splice(postIndex, 1);
     } else {
       // Like the post
-      if (!like)
-        post.usersLiked.push(req.user._id);
+      if (!like) post.usersLiked.push(req.user._id);
       // Add to user favorites
-      if (!favorites)
-        user.favoritePosts.push(req.params.id);
+      if (!favorites) user.favoritePosts.push(req.params.id);
     }
     await post.save();
     await user.save({ validateBeforeSave: false });
