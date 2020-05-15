@@ -127,10 +127,15 @@ router.put(
 
     const post = await Post.findById(req.params.id).populate('usersLiked');
     if (!post) return next(new ErrorResponse('Post not found', 404));
+
     const like = post.usersLiked.find(
       (userLiked) => userLiked._id.toString() === req.user._id.toString()
     );
-    if (like) {
+    const favorites = user.favoritePosts.find(
+      (favoritePost) => favoritePost._id.toString() === req.params.id.toString()
+    );
+
+    if (like && favorites) {
       // Remove post from favoritesPosts array
       const userIndex = user.favoritePosts.indexOf(req.user._id);
       user.favoritePosts.splice(userIndex, 1);
