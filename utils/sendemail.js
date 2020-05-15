@@ -1,26 +1,22 @@
-const nodemailer = require('nodemailer');
+//const nodemailer = require('nodemailer');
+const mailgun = require('mailgun-js');
 
-// async..await is not allowed in global scope, must use a wrapper
+const mg = mailgun({
+  apiKey: `${process.env.MAILGUN_APIKEY}`,
+  domain: `${process.env.MAILGUN_DOMAIN}`,
+});
+
 const sendEmail = async (options) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    auth: {
-      user: process.env.SMTP_EMAIL,
-      pass: process.env.SMTP_PASSWORD,
-    },
-  });
-
   // send mail with defined transport object
-  let message = {
-    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+  const data = {
+    from: `<${process.env.FROM_EMAIL}>`,
     to: options.email,
     subject: options.subject,
     html: options.html,
   };
-  const info = await transporter.sendMail(message);
-
-  console.log('Message sent: %s', info.messageId);
+  await mg.messages().send(data, function (error, body) {
+    console.log(body);
+  });
 };
 
 module.exports = sendEmail;
