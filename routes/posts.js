@@ -135,7 +135,7 @@ router.put(
       (favoritePost) => favoritePost.toString() === req.params.id.toString()
     );
 
-    if (like || favorites) {
+    if (like && favorites) {
       // Remove post from favoritesPosts array
       const userIndex = user.favoritePosts.indexOf(req.params.id);
       if (userIndex)
