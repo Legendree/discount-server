@@ -82,12 +82,12 @@ router.post(
     try {
       await sendEmail({
         email: user.email,
-        subject: 'Discount - Reset your password',
+        subject: 'Reset your password',
         html: `<p style="font-size:12px; color:MediumSeaGreen;"><b>${message}</b></p>`,
       });
       res.json({
         success: true,
-        data: 'Check out your Email son',
+        data: 'Email sent.',
       });
     } catch (error) {
       //   console.log(error);
@@ -96,7 +96,7 @@ router.post(
 
       await user.save({ validateBeforeSave: false });
 
-      return next(new ErrorResponse('Email could not be sent', 500));
+      return next(new ErrorResponse('Email could not be sent.', 500));
     }
   })
 );
