@@ -2,7 +2,7 @@ module.exports = (model, populate) => async (req, res, next) => {
     let reqQuery = { ...req.query };
     let query;
 
-    const removeFields = ['page', 'populate', 'limit', 'select']
+    const removeFields = ['page', 'populate', 'limit', 'select', 'sort']
         .forEach(field => delete reqQuery[field]);
 
     // Pagination 
