@@ -160,13 +160,19 @@ router.put(
 
 
 router.post('/firebase/notify', [auth, role('admin')], asyncHandler(async (req, res, next) => {
-  const registrationToken = req.body.registartionToken; //An array of tokens
+  const usersFcm = await User.find({ fcmToken: { $exists: true } }).select('fcmToken');
+  var registrationTokens = []; //An array of tokens
+  usersFcm.forEach((user) => {
+    registrationTokens.push(user.fcmToken);
+  });
+
+  console.log(registrationTokens);
   const message = req.body.message;
   const options = {
     priority: 'high',
     timeToLive: 60 * 60 * 24
   };
-  const messaging = await firebaseAdmin.messaging().sendToDevice(registrationToken, message, options);
+  const messaging = await firebaseAdmin.messaging().sendToDevice(registrationTokens, message, options);
   if (!messaging) return next(new ErrorResponse('Messages not sent to the users', 500));
 
   res.status(200).json({ success: true, data: 'Messages sent' });

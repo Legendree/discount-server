@@ -199,9 +199,11 @@ router.put(
   auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
-    user.fcmToken = req.body.token;
+    const { token } = req.body;
+    if (!user) return next(new ErrorResponse('No user found to perform this task', 404));
+    user.fcmToken = token;
     await user.save({ validateBeforeSave: false });
-    res.status(200).json({ success: true })
+    res.status(200).json({ success: true, data: user })
   })
 );
 
