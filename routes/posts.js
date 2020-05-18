@@ -13,6 +13,8 @@ const { uploadPhoto, deletePhoto } = require('../middleware/imageManager');
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 
+const firebaseAdmin = require('../firebase/admin');
+
 const path = require('path');
 
 const router = express.Router();
@@ -154,6 +156,21 @@ router.put(
     await user.save({ validateBeforeSave: false });
     res.status(200).json({ success: true, data: post });
   })
+);
+
+
+router.post('/firebase/notify', [auth, role('admin')], asyncHandler(async (req, res, next) => {
+  const registrationToken = req.body.registartionToken; //An array of tokens
+  const message = req.body.message;
+  const options = {
+    priority: 'high',
+    timeToLive: 60 * 60 * 24
+  };
+  const messaging = await firebaseAdmin.messaging().sendToDevice(registrationToken, message, options);
+  if (!messaging) return next(new ErrorResponse('Messages not sent to the users', 500));
+
+  res.status(200).json({ success: true, data: 'Messages sent' });
+})
 );
 
 // router.put(

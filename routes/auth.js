@@ -12,14 +12,13 @@ const router = express.Router();
 router.post(
   '/register',
   asyncHandler(async (req, res, next) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, fcmToken } = req.body;
     const user = await User.create({
       name,
       email,
       password,
-      role,
+      role
     });
-
     sendTokenResponse(user, 200, res);
   })
 );
@@ -192,6 +191,17 @@ router.get(
       success: true,
       data: user.favoritePosts,
     });
+  })
+);
+
+router.put(
+  '/updatefcm',
+  auth,
+  asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    user.fcmToken = req.body.token;
+    await user.save();
+    res.status(200).json({ success: true })
   })
 );
 

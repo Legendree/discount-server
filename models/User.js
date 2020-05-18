@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema({
       ref: 'Post',
     },
   ],
+  fcmToken: String
 });
 
 // Encrypt password
