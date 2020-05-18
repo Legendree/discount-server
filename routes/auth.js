@@ -200,7 +200,7 @@ router.put(
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
     user.fcmToken = req.body.token;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
     res.status(200).json({ success: true })
   })
 );
