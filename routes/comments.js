@@ -1,7 +1,7 @@
 const express = require('express');
 
 const Post = require('../models/Posts');
-const Comment = require('../models/comment');
+const Comment = require('../models/Comment');
 
 const ErrorResponse = require('../utils/errorResponse');
 const advacedQuery = require('../middleware/advancedQuery');

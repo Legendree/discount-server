@@ -1,6 +1,6 @@
 const express = require('express');
 const asyncHandler = require('express-async-handler');
-const User = require('../models/user');
+const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');

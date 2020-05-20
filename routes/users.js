@@ -1,6 +1,6 @@
 const express = require('express');
 
-const User = require('../models/user');
+const User = require('../models/User');
 
 const ErrorResponse = require('../utils/errorResponse');
 
