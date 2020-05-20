@@ -73,9 +73,7 @@ app.use('/v1/api/comments', comments);
 // Error handling
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-
-const server = app.listen(PORT, () =>
+const server = app.listen(process.env.PORT || 5000, () =>
   console.log(`Server running on port ${PORT}`.green.bold)
 );
 
