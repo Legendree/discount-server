@@ -10,7 +10,7 @@ module.exports.uploadPhoto = async (file) => {
     const fileContent = fs.readFileSync(file.location);
     const upload = await s3.upload({
         Bucket: process.env.AWS_BUCKET,
-        Key: `uploads/${file.name}`, //uploads/...
+        Key: `posts/${file.name}`, //uploads/...
         Body: fileContent
     }).promise();
     console.log(upload.Location);

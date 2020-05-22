@@ -76,11 +76,12 @@ router.post(
     const ext = path.extname(image);
     if (ext !== '.png' && ext !== '.jpg')
       return next(new ErrorResponse('File format is not supported', 400));
-    const upload = await uploadPhoto({
+    const file = {
       location: image,
       name: `${Date.now()}_${storeName}_${post._id}${ext}`,
-    });
-    post.image = upload.Location;
+    };
+    await uploadPhoto(file);
+    post.image = `http://cloud.discountapp.net/posts/${file.name}`
     await post.save();
     res.status(200).json({
       success: true,
