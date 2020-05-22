@@ -2,7 +2,7 @@ module.exports = (model, populate) => async (req, res, next) => {
     let reqQuery = { ...req.query };
     let query;
 
-    const removeFields = ['page', 'populate', 'limit', 'select', 'sort', 'category']
+    const removeFields = ['page', 'populate', 'limit', 'select', 'sort']
         .forEach(field => delete reqQuery[field]);
 
     // Pagination 
@@ -14,10 +14,6 @@ module.exports = (model, populate) => async (req, res, next) => {
     // Usage: ?keywords=castro+pullandbear+adika
     if (req.query.keywords) {
         query = model.find({ storeName: { $regex: req.query.keywords, $options: 'gi' } });
-    }
-    else if (req.query.category) {
-        const cat = req.query.category;
-        query = model.find({ category: cat });
     }
     else {
         query = model.find(reqQuery).limit(lim).skip(skipped);
