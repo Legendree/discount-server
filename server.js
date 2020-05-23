@@ -38,11 +38,11 @@ if (process.env.NODE_ENV === 'development') {
 
 /// Middleware
 // Rate limiting for the api call
-// app.set('trust proxy', 1); // Should be enabled when behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+app.set('trust proxy', 1); // Should be enabled when behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
 
 const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 250,
+  max: 85,
 });
 
 app.use(apiLimiter);
