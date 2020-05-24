@@ -40,7 +40,13 @@ const userSchema = new mongoose.Schema({
       ref: 'Post',
     },
   ],
-  fcmToken: String
+  subscribedStores: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Store',
+    },
+  ],
+  fcmToken: String,
 });
 
 // Encrypt password
