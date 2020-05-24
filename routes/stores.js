@@ -99,33 +99,27 @@ router.delete(
   })
 );
 
-router.put(
-  '/:storeName/subscribe',
+router.post(
+  '/subscribe',
   auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user._id);
-    if (!user) return next(new ErrorResponse('You are not logged in', 404));
+    if (!user) return next(new ErrorResponse('You are not logged in', 400));
 
-    const storeName = req.params.storeName;
-    const store = await Store.findOne({ storeName });
+    const stores = req.body.stores;
 
-    console.log(store);
+    if (!stores) return next(new ErrorResponse('Add stores for subscription'));
+    user.subscribedStores = [];
 
-    if (!store) return next(new ErrorResponse('No store found', 404));
-
-    const subscribed = user.subscribedStores.find(
-      (sub) => sub.toString() === store._id.toString()
-    );
-
-    if (subscribed) {
-      // Remove store from subscribedStores array
-      const userIndex = user.subscribedStores.indexOf(store._id);
-      if (userIndex >= 0) user.subscribedStores.splice(userIndex, 1);
-    } else {
-      // Add to user subscribed stores
-      if (!subscribed) user.subscribedStores.push(store._id);
+    for (let i = 0; i < stores.length; ++i) {
+      const store = await Store.findOne({ storeName: stores[i] });
+      if (!store) return next(new ErrorResponse('store doesnt exist'));
+      user.subscribedStores.push(store._id);
     }
+
     await user.save({ validateBeforeSave: false });
+    console.log(user.subscribedStores);
+
     res.status(200).json({ success: true, data: user });
   })
 );
