@@ -4,7 +4,7 @@ const Store = require('../models/Store');
 const User = require('../models/User');
 
 const ErrorResponse = require('../utils/errorResponse');
-const advacedQuery = require('../middleware/advancedQuery');
+const advancedQuery = require('../middleware/advancedQuery');
 const asyncHandler = require('express-async-handler');
 
 const auth = require('../middleware/auth');
@@ -20,7 +20,7 @@ router.use('/:storeId/posts', require('./posts'));
 
 router.get(
   '/',
-  advacedQuery(Store),
+  advancedQuery(Store),
   asyncHandler(async (req, res, next) => {
     res.status(200).json({
       success: true,
@@ -31,9 +31,10 @@ router.get(
 );
 
 router.get(
-  '/:id',
+  '/:storeName',
   asyncHandler(async (req, res, next) => {
-    const store = await Store.findById(req.params.id);
+    const storeName = req.params.storeName;
+    const store = await Store.findOne({ storeName });
     if (!store) return next(new ErrorResponse('Store not found', 404));
     res.status(200).json({
       success: true,
@@ -99,23 +100,30 @@ router.delete(
 );
 
 router.put(
-  '/:id/subscribe',
+  '/:storeName/subscribe',
   auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user._id);
     if (!user) return next(new ErrorResponse('You are not logged in', 404));
 
+    const storeName = req.params.storeName;
+    const store = await Store.findOne({ storeName });
+
+    console.log(store);
+
+    if (!store) return next(new ErrorResponse('No store found', 404));
+
     const subscribed = user.subscribedStores.find(
-      (store) => store.toString() === req.params.id.toString()
+      (sub) => sub.toString() === store._id.toString()
     );
 
     if (subscribed) {
       // Remove store from subscribedStores array
-      const userIndex = user.subscribedStores.indexOf(req.params.id);
+      const userIndex = user.subscribedStores.indexOf(store._id);
       if (userIndex >= 0) user.subscribedStores.splice(userIndex, 1);
     } else {
       // Add to user subscribed stores
-      if (!subscribed) user.subscribedStores.push(req.params.id);
+      if (!subscribed) user.subscribedStores.push(store._id);
     }
     await user.save({ validateBeforeSave: false });
     res.status(200).json({ success: true, data: user });

@@ -2,6 +2,7 @@ const express = require('express');
 
 const Post = require('../models/Posts');
 const User = require('../models/User');
+const Store = require('../models/Store');
 
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -26,7 +27,7 @@ router.use('/:postId/comments', require('./comments'));
 // @access  Public
 router.get(
   '/',
-  advanceQuery(Post),
+  advanceQuery(Post, 'storeName'),
   asyncHandler(async (req, res, next) => {
     res.status(200).json({
       success: true,
@@ -58,8 +59,6 @@ router.post(
   '/',
   [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
-    req.body.storeName = req.params.storeId;
-
     const {
       storeName,
       description,
@@ -69,8 +68,15 @@ router.post(
       image,
     } = req.body;
 
+    const store = await Store.findOne({ storeName });
+    if (!store) return next(new ErrorResponse('No such store exist, please create the store and try again', 404));
+    console.log(store);
+    const storeId = store._id;
+
+    console.log(storeId);
+
     const post = await Post.create({
-      storeName,
+      storeName: storeId,
       description,
       category,
       expiresAt,
