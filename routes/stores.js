@@ -1,6 +1,7 @@
 const express = require('express');
 
 const Store = require('../models/Store');
+const User = require('../models/User');
 
 const ErrorResponse = require('../utils/errorResponse');
 const advacedQuery = require('../middleware/advancedQuery');
@@ -97,6 +98,28 @@ router.delete(
   })
 );
 
-router.put('');
+router.put(
+  '/:id/subscribe',
+  auth,
+  asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user._id);
+    if (!user) return next(new ErrorResponse('You are not logged in', 404));
+
+    const subscribed = user.subscribedStores.find(
+      (store) => store.toString() === req.params.id.toString()
+    );
+
+    if (subscribed) {
+      // Remove store from subscribedStores array
+      const userIndex = user.subscribedStores.indexOf(req.params.id);
+      if (userIndex >= 0) user.subscribedStores.splice(userIndex, 1);
+    } else {
+      // Add to user subscribed stores
+      if (!subscribed) user.subscribedStores.push(req.params.id);
+    }
+    await user.save({ validateBeforeSave: false });
+    res.status(200).json({ success: true, data: user });
+  })
+);
 
 module.exports = router;
