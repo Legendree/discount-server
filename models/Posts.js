@@ -2,10 +2,8 @@ const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
   storeName: {
-    type: String,
-    minlength: 2,
-    maxlength: 16,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Store',
   },
   category: {
     type: String,
@@ -35,15 +33,17 @@ const postSchema = new mongoose.Schema({
     required: [true, 'Please enter experation date for this sale'],
   },
   storeColor: Number,
-  usersLiked: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
+  usersLiked: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
   likeCount: Number,
 });
 
 postSchema.pre('save', function () {
   this.likeCount = this.usersLiked.length;
-})
+});
 
 module.exports = mongoose.model('Post', postSchema);

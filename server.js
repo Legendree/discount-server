@@ -23,6 +23,7 @@ const posts = require('./routes/posts');
 const auth = require('./routes/auth');
 const user = require('./routes/users');
 const comments = require('./routes/comments');
+const stores = require('./routes/stores');
 
 // Database connection require
 const connectDb = require('./config/db');
@@ -69,6 +70,7 @@ app.use('/v1/api/posts', posts);
 app.use('/v1/api/auth', auth);
 app.use('/v1/api/users', user);
 app.use('/v1/api/comments', comments);
+app.use('/v1/api/stores', stores);
 
 // Error handling
 app.use(errorHandler);
