@@ -7,6 +7,7 @@ const advacedQuery = require('../middleware/advancedQuery');
 const asyncHandler = require('express-async-handler');
 
 const auth = require('../middleware/auth');
+const role = require('../middleware/role');
 
 const router = express.Router();
 
@@ -89,3 +90,5 @@ router.delete(
     });
   })
 );
+
+module.exports = router;
