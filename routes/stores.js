@@ -9,6 +9,10 @@ const asyncHandler = require('express-async-handler');
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 
+const path = require('path');
+
+const { uploadPhoto } = require('../middleware/imageManager');
+
 const router = express.Router();
 
 router.get(
