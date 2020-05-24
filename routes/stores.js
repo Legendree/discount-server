@@ -99,27 +99,51 @@ router.delete(
   })
 );
 
-router.post(
-  '/subscribe',
+// router.post(
+//   '/subscribe',
+//   auth,
+//   asyncHandler(async (req, res, next) => {
+//     const user = await User.findById(req.user._id);
+//     if (!user) return next(new ErrorResponse('You are not logged in', 400));
+
+//     const stores = req.body.stores;
+
+//     if (!stores) return next(new ErrorResponse('Add stores for subscription'));
+//     user.subscribedStores = [];
+
+//     for (let i = 0; i < stores.length; ++i) {
+//       const store = await Store.findOne({ storeName: stores[i] });
+//       if (!store) return next(new ErrorResponse('store doesnt exist'));
+//       user.subscribedStores.push(store._id);
+//     }
+
+//     await user.save({ validateBeforeSave: false });
+//     console.log(user.subscribedStores);
+
+//     res.status(200).json({ success: true, data: user });
+//   })
+// );
+
+router.put(
+  '/:id/subscribe',
   auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user._id);
-    if (!user) return next(new ErrorResponse('You are not logged in', 400));
+    if (!user) return next(new ErrorResponse('You are not logged in', 404));
 
-    const stores = req.body.stores;
+    const subscribed = user.subscribedStores.find(
+      (store) => store.toString() === req.params.id.toString()
+    );
 
-    if (!stores) return next(new ErrorResponse('Add stores for subscription'));
-    user.subscribedStores = [];
-
-    for (let i = 0; i < stores.length; ++i) {
-      const store = await Store.findOne({ storeName: stores[i] });
-      if (!store) return next(new ErrorResponse('store doesnt exist'));
-      user.subscribedStores.push(store._id);
+    if (subscribed) {
+      // Remove store from subscribedStores array
+      const userIndex = user.subscribedStores.indexOf(req.params.id);
+      if (userIndex >= 0) user.subscribedStores.splice(userIndex, 1);
+    } else {
+      // Add to user subscribed stores
+      if (!subscribed) user.subscribedStores.push(req.params.id);
     }
-
     await user.save({ validateBeforeSave: false });
-    console.log(user.subscribedStores);
-
     res.status(200).json({ success: true, data: user });
   })
 );
