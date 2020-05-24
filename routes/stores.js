@@ -14,7 +14,7 @@ const path = require('path');
 
 const { uploadPhoto } = require('../middleware/imageManager');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.use('/:storeId/posts', require('./posts'));
 
@@ -99,53 +99,53 @@ router.delete(
   })
 );
 
-// router.post(
-//   '/subscribe',
-//   auth,
-//   asyncHandler(async (req, res, next) => {
-//     const user = await User.findById(req.user._id);
-//     if (!user) return next(new ErrorResponse('You are not logged in', 400));
-
-//     const stores = req.body.stores;
-
-//     if (!stores) return next(new ErrorResponse('Add stores for subscription'));
-//     user.subscribedStores = [];
-
-//     for (let i = 0; i < stores.length; ++i) {
-//       const store = await Store.findOne({ storeName: stores[i] });
-//       if (!store) return next(new ErrorResponse('store doesnt exist'));
-//       user.subscribedStores.push(store._id);
-//     }
-
-//     await user.save({ validateBeforeSave: false });
-//     console.log(user.subscribedStores);
-
-//     res.status(200).json({ success: true, data: user });
-//   })
-// );
-
 router.put(
-  '/:id/subscribe',
+  '/:userId/subscribe',
   auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user._id);
-    if (!user) return next(new ErrorResponse('You are not logged in', 404));
+    if (!user) return next(new ErrorResponse('You are not logged in', 400));
 
-    const subscribed = user.subscribedStores.find(
-      (store) => store.toString() === req.params.id.toString()
-    );
+    const stores = req.body.stores;
 
-    if (subscribed) {
-      // Remove store from subscribedStores array
-      const userIndex = user.subscribedStores.indexOf(req.params.id);
-      if (userIndex >= 0) user.subscribedStores.splice(userIndex, 1);
-    } else {
-      // Add to user subscribed stores
-      if (!subscribed) user.subscribedStores.push(req.params.id);
+    if (!stores) return next(new ErrorResponse('Add stores for subscription'));
+    user.subscribedStores = [];
+
+    for (let i = 0; i < stores.length; ++i) {
+      const store = await Store.findOne({ storeName: stores[i] });
+      if (!store) return next(new ErrorResponse('store doesnt exist'));
+      user.subscribedStores.push(store._id);
     }
+
     await user.save({ validateBeforeSave: false });
+    console.log(user.subscribedStores);
+
     res.status(200).json({ success: true, data: user });
   })
 );
+
+// router.put(
+//   '/:id/subscribe',
+//   auth,
+//   asyncHandler(async (req, res, next) => {
+//     const user = await User.findById(req.user._id);
+//     if (!user) return next(new ErrorResponse('You are not logged in', 404));
+
+//     const subscribed = user.subscribedStores.find(
+//       (store) => store.toString() === req.params.id.toString()
+//     );
+
+//     if (subscribed) {
+//       // Remove store from subscribedStores array
+//       const userIndex = user.subscribedStores.indexOf(req.params.id);
+//       if (userIndex >= 0) user.subscribedStores.splice(userIndex, 1);
+//     } else {
+//       // Add to user subscribed stores
+//       if (!subscribed) user.subscribedStores.push(req.params.id);
+//     }
+//     await user.save({ validateBeforeSave: false });
+//     res.status(200).json({ success: true, data: user });
+//   })
+// );
 
 module.exports = router;

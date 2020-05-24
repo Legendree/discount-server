@@ -11,6 +11,8 @@ const advanceQuery = require('../middleware/advancedQuery');
 
 const router = express.Router();
 
+router.use('/:userId/stores', require('./stores'));
+
 router.get(
   '/',
   advanceQuery(User),
@@ -77,5 +79,4 @@ router.delete(
     });
   })
 );
-
 module.exports = router;
