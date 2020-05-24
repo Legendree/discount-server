@@ -15,6 +15,8 @@ const { uploadPhoto } = require('../middleware/imageManager');
 
 const router = express.Router();
 
+router.use('/:storeId/posts', require('./posts'));
+
 router.get(
   '/',
   advacedQuery(Store),
@@ -94,5 +96,7 @@ router.delete(
     });
   })
 );
+
+router.put('');
 
 module.exports = router;

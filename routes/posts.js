@@ -17,7 +17,7 @@ const firebaseAdmin = require('../firebase/admin');
 
 const path = require('path');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.use('/:postId/comments', require('./comments'));
 
@@ -58,6 +58,8 @@ router.post(
   '/',
   [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
+    req.body.storeName = req.params.storeId;
+
     const {
       storeName,
       description,
@@ -66,6 +68,7 @@ router.post(
       storeColor,
       image,
     } = req.body;
+
     const post = await Post.create({
       storeName,
       description,
@@ -73,6 +76,7 @@ router.post(
       expiresAt,
       storeColor,
     });
+
     const ext = path.extname(image);
     if (ext !== '.png' && ext !== '.jpg')
       return next(new ErrorResponse('File format is not supported', 400));
@@ -81,7 +85,7 @@ router.post(
       name: `${Date.now()}_${storeName}_${post._id}${ext}`,
     };
     await uploadPhoto(file);
-    post.image = `http://cloud.discountapp.net/posts/${file.name}`
+    post.image = `http://cloud.discountapp.net/posts/${file.name}`;
     await post.save();
     res.status(200).json({
       success: true,
@@ -141,12 +145,10 @@ router.put(
     if (like && favorites) {
       // Remove post from favoritesPosts array
       const userIndex = user.favoritePosts.indexOf(req.params.id);
-      if (userIndex >= 0)
-        user.favoritePosts.splice(userIndex, 1);
+      if (userIndex >= 0) user.favoritePosts.splice(userIndex, 1);
       // Remove like from usersLiked array
       const postIndex = post.usersLiked.indexOf(req.user._id);
-      if (postIndex >= 0)
-        post.usersLiked.splice(postIndex, 1);
+      if (postIndex >= 0) post.usersLiked.splice(postIndex, 1);
     } else {
       // Like the post
       if (!like) post.usersLiked.push(req.user._id);
@@ -159,25 +161,32 @@ router.put(
   })
 );
 
+router.post(
+  '/firebase/notify',
+  [auth, role('admin')],
+  asyncHandler(async (req, res, next) => {
+    const usersFcm = await User.find({ fcmToken: { $exists: true } }).select(
+      'fcmToken'
+    );
+    var registrationTokens = []; //An array of tokens
+    usersFcm.forEach((user) => {
+      registrationTokens.push(user.fcmToken);
+    });
 
-router.post('/firebase/notify', [auth, role('admin')], asyncHandler(async (req, res, next) => {
-  const usersFcm = await User.find({ fcmToken: { $exists: true } }).select('fcmToken');
-  var registrationTokens = []; //An array of tokens
-  usersFcm.forEach((user) => {
-    registrationTokens.push(user.fcmToken);
-  });
+    console.log(registrationTokens);
+    const message = req.body.message;
+    const options = {
+      priority: 'high',
+      timeToLive: 60 * 60 * 24,
+    };
+    const messaging = await firebaseAdmin
+      .messaging()
+      .sendToDevice(registrationTokens, message, options);
+    if (!messaging)
+      return next(new ErrorResponse('Messages not sent to the users', 500));
 
-  console.log(registrationTokens);
-  const message = req.body.message;
-  const options = {
-    priority: 'high',
-    timeToLive: 60 * 60 * 24
-  };
-  const messaging = await firebaseAdmin.messaging().sendToDevice(registrationTokens, message, options);
-  if (!messaging) return next(new ErrorResponse('Messages not sent to the users', 500));
-
-  res.status(200).json({ success: true, data: 'Messages sent' });
-})
+    res.status(200).json({ success: true, data: 'Messages sent' });
+  })
 );
 
 // router.put(

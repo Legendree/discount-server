@@ -6,6 +6,7 @@ const storeSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 16,
     required: true,
+    unique: true,
   },
   image: {
     type: String,
