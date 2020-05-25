@@ -11,10 +11,10 @@ module.exports = (model, populate) => async (req, res, next) => {
     const skipped = (parseInt(req.query.page) * lim) - lim;
 
     // Ability to find a store by a keyword
-    // Usage: ?keywords=castro+pullandbear+adika
+    // Usage: ?keywords=castro,pullandbear,adika
     if (req.query.keywords) {
         const words = req.query.keywords.replace(/[+, ]/gm, match => ' ');
-        query = model.find({ alias: { $regex: words, $options: 'mgi' } });
+        query = model.find({ alias: { $regex: `[${words}]`, $options: 'mgi' } });
     }
     else {
         query = model.find(reqQuery).limit(lim).skip(skipped);
