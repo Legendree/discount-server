@@ -69,7 +69,13 @@ router.post(
     } = req.body;
 
     const store = await Store.findOne({ storeName });
-    if (!store) return next(new ErrorResponse('No such store exist, please create the store and try again', 404));
+    if (!store)
+      return next(
+        new ErrorResponse(
+          'No such store exist, please create the store and try again',
+          404
+        )
+      );
     console.log(store);
     const storeId = store._id;
 
@@ -81,7 +87,7 @@ router.post(
       category,
       expiresAt,
       storeColor,
-      alias: storeName.toLowerCase()
+      alias: storeName.toLowerCase(),
     });
 
     const ext = path.extname(image);
@@ -178,6 +184,7 @@ router.post(
     var registrationTokens = []; //An array of tokens
     usersFcm.forEach((user) => {
       registrationTokens.push(user.fcmToken);
+      user.lastNotification = Date.now;
     });
 
     console.log(registrationTokens);
