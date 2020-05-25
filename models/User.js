@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema({
     },
   ],
   fcmToken: String,
+  lastNotification: Date,
 });
 
 // Encrypt password
