@@ -12,9 +12,13 @@ module.exports = (model, populate) => async (req, res, next) => {
 
     // Ability to find a store by a keyword
     // Usage: ?keywords=castro,pullandbear,adika
-    if (req.query.keywords) {
-        const words = req.query.keywords.replace(/[+, ]/gm, match => ' ');
+    if (req.query.favs) {
+        const words = req.query.favs.replace(/[+, ]/gm, match => ' ');
         query = model.find({ alias: { $regex: `[${words}]`, $options: 'mgi' } });
+    }
+    else if (req.query.keywords) {
+        const store = req.query.keywords.replace(/[+, ]/gm, match => ' ');
+        query = model.find({ alias: { $regex: `\W*(${store})\W*`, $options: 'mgi' } });
     }
     else {
         query = model.find(reqQuery).limit(lim).skip(skipped);
