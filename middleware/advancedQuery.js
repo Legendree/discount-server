@@ -13,8 +13,8 @@ module.exports = (model, populate) => async (req, res, next) => {
     // Ability to find a store by a keyword
     // Usage: ?keywords=castro+pullandbear+adika
     if (req.query.keywords) {
-
-        query = model.find({ alias: { $regex: /[^+ ,]/, $options: 'gi' } });
+        const words = req.query.keywords.replace(/[+, ]/gm, match => ' ');
+        query = model.find({ alias: { $regex: words, $options: 'mgi' } });
     }
     else {
         query = model.find(reqQuery).limit(lim).skip(skipped);
