@@ -40,6 +40,7 @@ const postSchema = new mongoose.Schema({
     },
   ],
   likeCount: Number,
+  alias: String
 });
 
 postSchema.pre('save', function () {

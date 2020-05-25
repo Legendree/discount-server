@@ -81,6 +81,7 @@ router.post(
       category,
       expiresAt,
       storeColor,
+      alias: storeName.toLowerCase()
     });
 
     const ext = path.extname(image);
