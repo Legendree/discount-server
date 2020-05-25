@@ -99,8 +99,8 @@ router.delete(
   })
 );
 
-router.put(
-  '/:userId/subscribe',
+router.post(
+  '/subscribe',
   auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user._id);
