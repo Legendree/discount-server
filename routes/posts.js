@@ -86,15 +86,23 @@ router.post(
         return user.fcmToken;
       }
     });
-    console.log(subscribedUsers);
-    if (subscribedUsers === undefined || subscribedUsers.length == 0) {
+    if (subscribedUsers !== undefined && subscribedUsers.length > 0) {
       var registrationTokens = []; //An array of tokens
+      const twoDays = 60 * 60 * 48 * 1000;
       subscribedUsers.forEach((user) => {
-        registrationTokens.push(user.fcmToken);
+        if (user.lastNotification - Date.now() > twoDays) {
+          registrationTokens.push(user.fcmToken);
+          user.lastNotification = Date.now;
+        }
       });
 
       console.log(registrationTokens);
-      const message = req.body.message;
+      const message = {
+        notification: {
+          title: storeName,
+          body: 'One of your favorite stores have new discount',
+        },
+      };
       const options = {
         priority: 'high',
         timeToLive: 60 * 60 * 24,
