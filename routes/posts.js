@@ -76,10 +76,38 @@ router.post(
           404
         )
       );
-    console.log(store);
+
     const storeId = store._id;
 
-    console.log(storeId);
+    // Check if user subscribed to store
+    const users = await User.find().select('fcmToken subscribedStores');
+    const subscribedUsers = users.filter((user) => {
+      if (user.subscribedStores.includes(storeId)) {
+        return user.fcmToken;
+      }
+    });
+    console.log(subscribedUsers);
+    if (subscribedUsers === undefined || subscribedUsers.length == 0) {
+      var registrationTokens = []; //An array of tokens
+      subscribedUsers.forEach((user) => {
+        registrationTokens.push(user.fcmToken);
+      });
+
+      console.log(registrationTokens);
+      const message = req.body.message;
+      const options = {
+        priority: 'high',
+        timeToLive: 60 * 60 * 24,
+      };
+      const messaging = await firebaseAdmin
+        .messaging()
+        .sendToDevice(registrationTokens, message, options);
+
+      if (!messaging)
+        return next(new ErrorResponse('Messages not sent to the users', 500));
+
+      res.status(200).json({ success: true, data: 'Messages sent' });
+    }
 
     const post = await Post.create({
       storeName: storeId,
@@ -184,7 +212,6 @@ router.post(
     var registrationTokens = []; //An array of tokens
     usersFcm.forEach((user) => {
       registrationTokens.push(user.fcmToken);
-      user.lastNotification = Date.now;
     });
 
     console.log(registrationTokens);
