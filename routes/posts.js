@@ -80,23 +80,29 @@ router.post(
     const storeId = store._id;
 
     // Check if user subscribed to store
-    const users = await User.find().select('fcmToken subscribedStores');
-    const subscribedUsers = users.filter((user) => {
-      if (user.subscribedStores.includes(storeId)) {
-        return user.fcmToken;
-      }
-    });
+    const users = await User.find({ fcmToken: { $exists: true }, subscribedStores: { $exists: true } });//.select('fcmToken subscribedStores');
+    const subscribedUsers = users.filter(user => user.subscribedStores.includes(storeId));
+
+    //console.log(subscribedUsers[0].fcmToken);
+
     if (subscribedUsers !== undefined && subscribedUsers.length > 0) {
       var registrationTokens = []; //An array of tokens
       const twoDays = 60 * 60 * 48 * 1000;
-      subscribedUsers.forEach((user) => {
-        if (user.lastNotification - Date.now() > twoDays) {
+      subscribedUsers.forEach(async (user) => {
+        if (user.lastNotification !== undefined) {
+          if (Date.now() - user.lastNotification > twoDays) {
+            registrationTokens.push(user.fcmToken);
+            user.lastNotification = Date.now();
+          }
+        } else {
           registrationTokens.push(user.fcmToken);
-          user.lastNotification = Date.now;
+          user.lastNotification = Date.now();
         }
+        await user.save({ validateBeforeSave: false });
       });
 
       console.log(registrationTokens);
+
       const message = {
         notification: {
           title: storeName,
@@ -113,8 +119,6 @@ router.post(
 
       if (!messaging)
         return next(new ErrorResponse('Messages not sent to the users', 500));
-
-      res.status(200).json({ success: true, data: 'Messages sent' });
     }
 
     const post = await Post.create({
@@ -139,6 +143,7 @@ router.post(
     res.status(200).json({
       success: true,
       data: post,
+      message: 'sent to users'
     });
   })
 );
