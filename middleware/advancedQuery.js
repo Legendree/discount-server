@@ -22,6 +22,11 @@ module.exports = (model, populate) => async (req, res, next) => {
         console.log(store);
         query = model.find({ alias: { $regex: `\W*(${store})\W*`, $options: 'mgi' } });
     }
+    else if (req.query.category) {
+        const words = req.query.category.split(/[+, ]/gmi);
+        console.log(words);
+        query = model.find({ category: { $in: words } });
+    }
     else {
         query = model.find(reqQuery).limit(lim).skip(skipped);
     }
