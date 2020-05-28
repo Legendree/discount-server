@@ -6,8 +6,9 @@ const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 const sendEmail = require('../utils/sendemail');
 const crypto = require('crypto');
-
+const path = require('path');
 const router = express.Router();
+const fs = require('fs');
 
 router.post(
   '/register',
@@ -17,7 +18,7 @@ router.post(
       name,
       email,
       password,
-      role
+      role,
     });
     sendTokenResponse(user, 200, res);
   })
@@ -76,13 +77,19 @@ router.post(
       'host'
     )}/api/v1/auth/resetpassword/${resetToken}`;
 
-    const message = `You are recieving this email because you or someone else has requested to reset your password, please make a put request to \n\n <a href=${resetUrl}>${resetUrl}</a>`;
+    const htmlEmail = fs.readFileSync(
+      'C:UsersDanmiOneDriveDesktopDiscount\backenddiscount-serverhtml\resetpassword.html',
+      {
+        encoding: 'utf-8',
+      }
+    );
+    console.log(htmlEmail);
 
     try {
       await sendEmail({
         email: user.email,
         subject: 'Reset your password',
-        html: `<p style="font-size:12px; color:MediumSeaGreen;"><b>${message}</b></p>`,
+        html: htmlEmail,
       });
       res.json({
         success: true,
@@ -200,10 +207,11 @@ router.put(
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
     const { token } = req.body;
-    if (!user) return next(new ErrorResponse('No user found to perform this task', 404));
+    if (!user)
+      return next(new ErrorResponse('No user found to perform this task', 404));
     user.fcmToken = token;
     await user.save({ validateBeforeSave: false });
-    res.status(200).json({ success: true, data: user })
+    res.status(200).json({ success: true, data: user });
   })
 );
 

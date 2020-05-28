@@ -72,14 +72,13 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 // Generate and hash password
 userSchema.methods.getResetPasswordToken = function () {
   // Generate token
-  const resetToken = crypto.randomBytes(20).toString('hex');
+  const resetToken = crypto.randomBytes(4).toString('hex');
 
   // Hash token and save to resetPasswordToken field
   this.resetPasswordToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-
   // Set reset token expire to 10 min
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
   return resetToken;
