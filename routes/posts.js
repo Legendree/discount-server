@@ -104,7 +104,7 @@ router.post(
           registrationTokens.push(user.fcmToken);
           user.lastNotification = Date.now();
         }
-        await user.save({ validateBeforeSave: false });
+        await user.save();
       });
       if (registrationTokens !== undefined && registrationTokens.length > 0) {
         console.log(registrationTokens);
@@ -217,7 +217,7 @@ router.put(
       if (!favorites) user.favoritePosts.push(req.params.id);
     }
     await post.save();
-    await user.save({ validateBeforeSave: false });
+    await user.save();
     res.status(200).json({ success: true, data: post });
   })
 );

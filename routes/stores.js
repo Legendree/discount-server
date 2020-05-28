@@ -117,7 +117,7 @@ router.post(
       user.subscribedStores.push(store._id);
     }
 
-    await user.save({ validateBeforeSave: false });
+    await user.save();
     console.log(user.subscribedStores);
 
     res.status(200).json({ success: true, data: user });
@@ -144,7 +144,7 @@ router.put(
       if (!subscribed) user.subscribedStores.push(req.params.id);
       data = 'added';
     }
-    await user.save({ validateBeforeSave: false });
+    await user.save();
     res.status(200).json({ success: true, data });
   })
 );
