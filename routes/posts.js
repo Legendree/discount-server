@@ -92,11 +92,11 @@ router.post(
 
     if (subscribedUsers !== undefined && subscribedUsers.length > 0) {
       var registrationTokens = []; //An array of tokens
-      const twoDays = 60 * 60 * 48 * 1000;
+      const time = 60 * 60 * 4 * 1000;
       console.log(subscribedUsers);
       subscribedUsers.forEach(async (user) => {
         if (user.lastNotification !== undefined) {
-          if (Date.now() - user.lastNotification > twoDays) {
+          if (Date.now() - user.lastNotification > time) {
             registrationTokens.push(user.fcmToken);
             user.lastNotification = Date.now();
           }
