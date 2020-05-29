@@ -41,9 +41,6 @@ if (process.env.NODE_ENV === 'development') {
 // Rate limiting for the api call
 app.set('trust proxy', 1); // Should be enabled when behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
 
-// Setting ejs
-app.set('view engine', 'ejs');
-
 const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 85,

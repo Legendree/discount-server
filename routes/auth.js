@@ -6,9 +6,7 @@ const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 const sendEmail = require('../utils/sendemail');
 const crypto = require('crypto');
-const path = require('path');
 const router = express.Router();
-const fs = require('fs');
 
 router.post(
   '/register',
@@ -70,18 +68,100 @@ router.post(
     //Get reset token
     const resetToken = user.getResetPasswordToken();
 
-    //Create reset URL
-    const resetUrl = `${req.protocol}://${req.get(
-      'host'
-    )}/api/v1/auth/resetpassword/${resetToken}`;
+    await user.save({ validateBeforeSave: false });
 
-    const htmlEmail = fs.readFileSync(
-      '../html/resetpassword.html',
-      {
-        encoding: 'utf-8',
-      }
-    );
-    console.log(htmlEmail);
+    //Create reset URL
+    // const resetUrl = `${req.protocol}://${req.get(
+    //   'host'
+    // )}/api/v1/auth/resetpassword/${resetToken}`;
+
+    const htmlEmail = `<div
+    style="
+      background-color: white;
+      width: 550px;
+      padding-top: 25px;
+      padding-bottom: 25px;
+      margin-left: auto;
+      margin-right: auto;
+      border-style: solid;
+    "
+  >
+    <div
+      style="
+        font-family: Arial, Helvetica, sans-serif;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 500px;
+      "
+    >
+      <div
+        style="
+          padding-top: 15px;
+          padding-bottom: 15px;
+          padding-left: 30px;
+          padding-right: 30px;
+          margin-bottom: 10px;
+          text-align: center;
+          font-size: 16px;
+        "
+      >
+        <img
+          width="248"
+          height="62"
+          src="https://i.imgur.com/sq1gQvY.png"
+        />
+      </div>
+      <div
+        style="
+          padding-left: 30px;
+          padding-right: 30px;
+          margin-bottom: 10px;
+          text-align: center;
+          background-color: #fff;
+          font-size: 16px;
+          padding-top: 30px;
+          padding-bottom: 30px;
+        "
+      >
+        <span class="im"
+          ><div
+            style="
+              font-weight: 700;
+              font-size: 20px;
+              color: rgba(0, 0, 0, 1);
+            "
+          >
+           Reset password code:
+          </div>
+          <div style="height: 30px;">&nbsp;</div>
+          <div style="height: 30px;">&nbsp;</div>
+          <div>
+            <a
+              href=""
+              style="
+                text-transform: uppercase;
+                height: 50px;
+                padding: 15px 80px;
+                border-radius: 3px;
+                background-color: #000000;
+                border: none;
+                color: #fff;
+                text-align: center;
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 700;
+              "
+              >${resetToken}</a
+            >
+          </div><div style="height: 30px;">&nbsp;</div>
+          <div style="color: rgba(0, 0, 0, 1); margin-top: 25px;">
+            If you did not ask to reset your password and want to check your recent account access
+          </div>
+          <div style="margin-top: 25px;">
+            <a href="" style="text-decoration: none;">Contact Us</a></div>
+      </div>
+    </div>
+  </div>`;
 
     try {
       await sendEmail({
@@ -98,7 +178,7 @@ router.post(
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
 
-      await user.save();
+      await user.save({ validateBeforeSave: false });
 
       return next(new ErrorResponse('Email could not be sent.', 500));
     }
@@ -208,7 +288,7 @@ router.put(
     if (!user)
       return next(new ErrorResponse('No user found to perform this task', 404));
     user.fcmToken = token;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
     res.status(200).json({ success: true, data: user });
   })
 );
