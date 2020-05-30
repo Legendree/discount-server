@@ -68,8 +68,6 @@ router.post(
     //Get reset token
     const resetToken = user.getResetPasswordToken();
 
-    await user.save({ validateBeforeSave: false });
-
     //Create reset URL
     // const resetUrl = `${req.protocol}://${req.get(
     //   'host'
@@ -178,7 +176,7 @@ router.post(
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
 
-      await user.save({ validateBeforeSave: false });
+      await user.save();
 
       return next(new ErrorResponse('Email could not be sent.', 500));
     }
@@ -288,7 +286,7 @@ router.put(
     if (!user)
       return next(new ErrorResponse('No user found to perform this task', 404));
     user.fcmToken = token;
-    await user.save({ validateBeforeSave: false });
+    await user.save();
     res.status(200).json({ success: true, data: user });
   })
 );
