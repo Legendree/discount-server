@@ -105,7 +105,7 @@ router.post(
       >
         <img
           width="248"
-          height="62"
+          height=auto
           src="https://i.imgur.com/sq1gQvY.png"
         />
       </div>
