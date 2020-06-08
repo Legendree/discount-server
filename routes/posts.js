@@ -43,7 +43,7 @@ router.get(
 router.get(
   '/:id',
   asyncHandler(async (req, res, next) => {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id).populate('storeName');
     if (!post) return next(new ErrorResponse('Post not found', 404));
     res.status(200).json({
       success: true,

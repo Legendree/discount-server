@@ -21,3 +21,4 @@ module.exports = (err, req, res, next) => {
     .status(error.statusCode || 500)
     .json({ success: false, errorMsg: error.message || 'Server error' });
 };
+ 
