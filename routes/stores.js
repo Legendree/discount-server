@@ -34,7 +34,7 @@ router.get(
   '/:storeName',
   asyncHandler(async (req, res, next) => {
     const storeName = req.params.storeName;
-    const store = await Store.findOne({ storeName }).select('storeName');
+    const store = await Store.findOne({ storeName });
     if (!store) return next(new ErrorResponse('Store not found', 404));
     res.status(200).json({
       success: true,

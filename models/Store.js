@@ -12,10 +12,12 @@ const storeSchema = new mongoose.Schema({
     type: String,
     default: 'no-image.jpg',
     required: [true, 'Image of the sale is a required attribute'],
+    select: false,
   },
   createdAt: {
     type: Date,
     default: Date.now,
+    select: false,
   },
 });
 
