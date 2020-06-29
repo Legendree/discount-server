@@ -34,7 +34,7 @@ router.get(
   '/:storeName',
   asyncHandler(async (req, res, next) => {
     const storeName = req.params.storeName;
-    const store = await Store.findOne({ storeName });
+    const store = await Store.findOne({ storeName }).select('storeName');
     if (!store) return next(new ErrorResponse('Store not found', 404));
     res.status(200).json({
       success: true,
@@ -130,10 +130,10 @@ router.put(
   asyncHandler(async (req, res, next) => {
     var data;
     const user = await User.findById(req.user._id);
-    if (!user) return next(new ErrorResponse('You are not logged in', 404))
+    if (!user) return next(new ErrorResponse('You are not logged in', 404));
     const subscribed = user.subscribedStores.find(
       (store) => store.toString() === req.params.id.toString()
-    )
+    );
     if (subscribed) {
       // Remove store from subscribedStores array
       const userIndex = user.subscribedStores.indexOf(req.params.id);
