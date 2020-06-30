@@ -12,14 +12,12 @@ const postSchema = new mongoose.Schema({
       true,
       "Pleaese select one of the categories for this stores discount",
     ],
-    select: false,
   },
   description: {
     type: String,
     minlength: 5,
     maxlength: 128,
     required: true,
-    select: false,
   },
   image: {
     type: String,
@@ -29,12 +27,10 @@ const postSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    select: false,
   },
   expiresAt: {
     type: Date,
     required: [true, "Please enter experation date for this sale"],
-    select: false,
   },
   usersLiked: {
     type: [
