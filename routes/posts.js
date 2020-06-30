@@ -1,33 +1,33 @@
-const express = require('express');
+const express = require("express");
 
-const Post = require('../models/Posts');
-const User = require('../models/User');
-const Store = require('../models/Store');
+const Post = require("../models/Posts");
+const User = require("../models/User");
+const Store = require("../models/Store");
 
-const ErrorResponse = require('../utils/errorResponse');
+const ErrorResponse = require("../utils/errorResponse");
 
-const asyncHandler = require('express-async-handler');
-const advanceQuery = require('../middleware/advancedQuery');
+const asyncHandler = require("express-async-handler");
+const advanceQuery = require("../middleware/advancedQuery");
 
-const { uploadPhoto, deletePhoto } = require('../middleware/imageManager');
+const { uploadPhoto, deletePhoto } = require("../middleware/imageManager");
 
-const auth = require('../middleware/auth');
-const role = require('../middleware/role');
+const auth = require("../middleware/auth");
+const role = require("../middleware/role");
 
-const firebaseAdmin = require('../firebase/admin');
+const firebaseAdmin = require("../firebase/admin");
 
-const path = require('path');
+const path = require("path");
 
 const router = express.Router({ mergeParams: true });
 
-router.use('/:postId/comments', require('./comments'));
+router.use("/:postId/comments", require("./comments"));
 
 // @desc    Get all available posts
 // @route   GET /api/v1/posts
 // @access  Public
 router.get(
-  '/',
-  advanceQuery(Post, 'storeName'),
+  "/",
+  advanceQuery(Post, "storeName"),
   asyncHandler(async (req, res, next) => {
     res.status(200).json({
       success: true,
@@ -41,12 +41,10 @@ router.get(
 // @route   GET /api/v1/posts/:id
 // @access  Public
 router.get(
-  '/:id',
+  "/:id",
   asyncHandler(async (req, res, next) => {
-    const post = await Post.findById(req.params.id)
-      .select('description expiresAt')
-      .populate('storeName', 'storeName');
-    if (!post) return next(new ErrorResponse('Post not found', 404));
+    const post = await Post.findById(req.params.id).populate("storeName");
+    if (!post) return next(new ErrorResponse("Post not found", 404));
     res.status(200).json({
       success: true,
       data: post,
@@ -58,8 +56,8 @@ router.get(
 // @route   POST /api/v1/posts
 // @access  Private
 router.post(
-  '/',
-  [auth, role('admin')],
+  "/",
+  [auth, role("admin")],
   asyncHandler(async (req, res, next) => {
     const {
       storeName,
@@ -74,7 +72,7 @@ router.post(
     if (!store)
       return next(
         new ErrorResponse(
-          'No such store exist, please create the store and try again',
+          "No such store exist, please create the store and try again",
           404
         )
       );
@@ -113,12 +111,12 @@ router.post(
 
         const message = {
           notification: {
-            title: 'New discounts',
+            title: "New discounts",
             body: `${storeName} and more of your favorite stores have new discounts`,
           },
         };
         const options = {
-          priority: 'high',
+          priority: "high",
           timeToLive: 60 * 60 * 24,
         };
         const messaging = await firebaseAdmin
@@ -126,7 +124,7 @@ router.post(
           .sendToDevice(registrationTokens, message, options);
 
         if (!messaging)
-          return next(new ErrorResponse('Messages not sent to the users', 500));
+          return next(new ErrorResponse("Messages not sent to the users", 500));
       }
     }
 
@@ -140,8 +138,8 @@ router.post(
     });
 
     const ext = path.extname(image);
-    if (ext !== '.png' && ext !== '.jpg')
-      return next(new ErrorResponse('File format is not supported', 400));
+    if (ext !== ".png" && ext !== ".jpg")
+      return next(new ErrorResponse("File format is not supported", 400));
     const file = {
       location: image,
       name: `${Date.now()}_${storeName}_${post._id}${ext}`,
@@ -152,20 +150,20 @@ router.post(
     res.status(200).json({
       success: true,
       data: post,
-      message: 'sent to users',
+      message: "sent to users",
     });
   })
 );
 
 router.put(
-  '/:id',
-  [auth, role('admin')],
+  "/:id",
+  [auth, role("admin")],
   asyncHandler(async (req, res, next) => {
     const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
-    if (!post) return next(new ErrorResponse('Post not found', 404));
+    if (!post) return next(new ErrorResponse("Post not found", 404));
     res.status(200).json({
       success: true,
       data: post,
@@ -174,11 +172,11 @@ router.put(
 );
 
 router.delete(
-  '/:id',
-  [auth, role('admin')],
+  "/:id",
+  [auth, role("admin")],
   asyncHandler(async (req, res, next) => {
     const post = await Post.findById(req.params.id);
-    if (!post) return next(new ErrorResponse('Post not found', 404));
+    if (!post) return next(new ErrorResponse("Post not found", 404));
     if (post.image) await deletePhoto(post.image);
     await post.remove();
     res.status(200).json({
@@ -189,14 +187,14 @@ router.delete(
 );
 
 router.put(
-  '/:id/like',
+  "/:id/like",
   auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user._id);
-    if (!user) return next(new ErrorResponse('You are not logged in', 404));
+    if (!user) return next(new ErrorResponse("You are not logged in", 404));
 
-    const post = await Post.findById(req.params.id).populate('usersLiked');
-    if (!post) return next(new ErrorResponse('Post not found', 404));
+    const post = await Post.findById(req.params.id).populate("usersLiked");
+    if (!post) return next(new ErrorResponse("Post not found", 404));
 
     const like = post.usersLiked.find(
       (userLiked) => userLiked._id.toString() === req.user._id.toString()
@@ -225,11 +223,11 @@ router.put(
 );
 
 router.post(
-  '/firebase/notify',
-  [auth, role('admin')],
+  "/firebase/notify",
+  [auth, role("admin")],
   asyncHandler(async (req, res, next) => {
     const usersFcm = await User.find({ fcmToken: { $exists: true } }).select(
-      'fcmToken'
+      "fcmToken"
     );
     var registrationTokens = []; //An array of tokens
     usersFcm.forEach((user) => {
@@ -239,16 +237,16 @@ router.post(
     console.log(registrationTokens);
     const message = req.body.message;
     const options = {
-      priority: 'high',
+      priority: "high",
       timeToLive: 60 * 60 * 24,
     };
     const messaging = await firebaseAdmin
       .messaging()
       .sendToDevice(registrationTokens, message, options);
     if (!messaging)
-      return next(new ErrorResponse('Messages not sent to the users', 500));
+      return next(new ErrorResponse("Messages not sent to the users", 500));
 
-    res.status(200).json({ success: true, data: 'Messages sent' });
+    res.status(200).json({ success: true, data: "Messages sent" });
   })
 );
 
