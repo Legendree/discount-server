@@ -60,7 +60,11 @@ app.use(express.json());
 // Cookie parser
 app.use(cookieParser());
 // File upload
-app.use(fileupload());
+app.use(
+  fileupload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+  })
+);
 
 // Connecting to db after security is established above
 connectDb();
