@@ -141,6 +141,8 @@ router.post(
 
     post.image = `http://cloud.discountapp.net/posts/${file.name}`;
 
+    await post.save();
+
     res.status(200).json({
       success: true,
       data: post,
