@@ -20,12 +20,11 @@ router.use('/:storeId/posts', require('./posts'));
 
 router.get(
   '/',
-  advancedQuery(Store),
   asyncHandler(async (req, res, next) => {
+    const stores = await Store.find().sort('storeName');
     res.status(200).json({
       success: true,
-      count: res.advancedResult.length,
-      data: res.advancedResult,
+      data: stores,
     });
   })
 );
