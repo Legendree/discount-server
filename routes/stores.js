@@ -47,20 +47,10 @@ router.post(
   '/',
   [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
-    const { storeName, image } = req.body;
+    const { storeName } = req.body;
     const store = await Store.create({
       storeName,
     });
-    const ext = path.extname(image);
-    if (ext !== '.png' && ext !== '.jpg')
-      return next(new ErrorResponse('File format is not supported', 400));
-    const file = {
-      location: image,
-      name: `${Date.now()}_${storeName}_${store._id}${ext}`,
-    };
-    await uploadPhoto(file);
-    store.image = `http://cloud.discountapp.net/stores/${file.name}`;
-    await store.save();
     res.status(200).json({
       success: true,
       data: store,
