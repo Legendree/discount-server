@@ -8,8 +8,10 @@ module.exports = (model, populate) => async (req, res, next) => {
 
   // Pagination
   // Usage: works automatically
-  const lim = req.query.limit || 30;
+  const lim = req.query.limit || 5;
   const skipped = parseInt(req.query.page) * lim - lim;
+
+  console.log(lim);
 
   // Ability to find a store by a keyword
   // Usage: ?keywords=castro,pullandbear,adika
