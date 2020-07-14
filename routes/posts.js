@@ -37,6 +37,29 @@ router.get(
   })
 );
 
+// @desc    Get all available posts for logged-in users
+// @route   GET /api/v1/posts/logged
+// @access  Private
+router.get(
+  '/logged',
+  [auth, advanceQuery(Post, 'storeName')],
+  asyncHandler(async (req, res, next) => {
+    let result = res.advancedResult;
+
+    result.forEach((post) => {
+      post['isPostLiked'] = req.user.favoritePosts.includes(post._id);
+    });
+
+    console.log(result);
+
+    res.status(200).json({
+      success: true,
+      count: result.length,
+      data: result,
+    });
+  })
+);
+
 // @desc    Get available post by id
 // @route   GET /api/v1/posts/:id
 // @access  Public
