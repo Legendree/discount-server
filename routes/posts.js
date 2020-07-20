@@ -205,6 +205,17 @@ router.delete(
   })
 );
 
+router.delete(
+  '/cron_deletion',
+  asyncHandler(async (req, res, next) => {
+    await Post.remove({ expiresAt: { $lt: Date.now } });
+    res.status(200).json({
+      success: true,
+      data: 'Expired posts are deleted succsefully.',
+    });
+  })
+);
+
 router.put(
   '/:id/like',
   auth,
