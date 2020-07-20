@@ -192,6 +192,7 @@ router.put(
 
 router.delete(
   '/cron_deletion',
+  [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
     const currentDate = Date.now();
     const success = await Post.deleteMany({ expiresAt: { $lt: currentDate } });
