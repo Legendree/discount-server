@@ -191,24 +191,12 @@ router.put(
 );
 
 router.delete(
-  '/:id',
-  [auth, role('admin')],
-  asyncHandler(async (req, res, next) => {
-    const post = await Post.findById(req.params.id);
-    if (!post) return next(new ErrorResponse('Post not found', 404));
-    if (post.image) await deletePhoto(post.image);
-    await post.remove();
-    res.status(200).json({
-      success: true,
-      data: {},
-    });
-  })
-);
-
-router.delete(
   '/cron_deletion',
   asyncHandler(async (req, res, next) => {
-    await Post.remove({ expiresAt: { $lt: Date.now } });
+    const currentDate = Date.now();
+    const success = await Post.deleteMany({ expiresAt: { $lt: currentDate } });
+    if (!success)
+      return next(new ErrorResponse('Could not delete the posts', 500));
     res.status(200).json({
       success: true,
       data: 'Expired posts are deleted succsefully.',
