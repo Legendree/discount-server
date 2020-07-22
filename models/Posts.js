@@ -7,7 +7,7 @@ const postSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['clothing', 'accesories', 'food', 'electronics', 'beauty'],
+    enum: ['clothing', 'accesories', 'food', 'electronics', 'beauty', 'home'],
     required: [
       true,
       'Pleaese select one of the categories for this stores discount',
@@ -32,6 +32,7 @@ const postSchema = new mongoose.Schema({
     type: Date,
     required: [true, 'Please enter experation date for this sale'],
   },
+  saleLink: String,
   usersLiked: {
     type: [
       {
