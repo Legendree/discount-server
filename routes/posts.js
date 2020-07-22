@@ -150,12 +150,14 @@ router.post(
     if (file.size > 1024000)
       return next(new ErrorResponse('File size exceed its limit', 400));
 
+    const alias = storeName.toLowerCase().replace(/[!@#$%^&*(). ]/gi, '');
+
     const post = await Post.create({
       storeName: storeId,
       description,
       category,
       expiresAt,
-      alias: storeName.toLowerCase(),
+      alias,
     });
 
     file.name = `${post._id}_${Date.now()}.${info.type}`;
