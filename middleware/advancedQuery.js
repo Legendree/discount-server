@@ -29,6 +29,8 @@ module.exports = (model, populate) => async (req, res, next) => {
     const words = req.query.category.split(/[+, ]/gim);
     console.log(words);
     query = model.find({ category: { $in: words } });
+  } else {
+    query = model.find();
   }
 
   query = query.limit(lim).skip(skipped);
