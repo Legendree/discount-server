@@ -82,7 +82,7 @@ router.post(
   '/',
   [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
-    const { storeName, description, category, expiresAt, saleLink } = req.body;
+    const { storeName, description, category, expiresAt, url } = req.body;
 
     const store = await Store.findOne({ storeName });
     if (!store)
@@ -158,7 +158,7 @@ router.post(
       category,
       expiresAt,
       alias,
-      saleLink,
+      url,
     });
 
     file.name = `${post._id}_${Date.now()}.${info.type}`;

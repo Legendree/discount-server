@@ -27,7 +27,7 @@ const postSchema = new mongoose.Schema({
     type: Date,
     required: [true, 'Please enter experation date for this sale'],
   },
-  saleLink: String,
+  url: String,
   usersLiked: {
     type: [
       {
