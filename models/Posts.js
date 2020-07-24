@@ -13,12 +13,7 @@ const postSchema = new mongoose.Schema({
       'Pleaese select one of the categories for this stores discount',
     ],
   },
-  description: {
-    type: String,
-    minlength: 5,
-    maxlength: 128,
-    required: true,
-  },
+  description: String,
   image: {
     type: String,
     default: 'no-image.jpg',
