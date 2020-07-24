@@ -198,10 +198,10 @@ router.delete(
   [auth, role('admin')],
   asyncHandler(async (req, res, next) => {
     const currentDate = Date.now();
-    const posts = await Post.find({expiresAt: {$lt: currentDate}});
+    const posts = await Post.find({ expiresAt: { $lt: currentDate } });
     if (!posts)
       return next(new ErrorResponse('Could not delete the posts', 500));
-    posts.forEach((post) => await deletePhoto(post.image.substr(0, 29)));
+    posts.forEach(async (post) => await deletePhoto(post.image.substr(0, 29)));
     await Post.deleteMany({ expiresAt: { $lt: currentDate } });
 
     res.status(200).json({
