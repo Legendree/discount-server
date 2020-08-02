@@ -216,31 +216,33 @@ router.put(
   auth,
   asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user._id);
-    if (!user) return next(new ErrorResponse('You are not logged in', 404));
+    if (!user) return next(new ErrorResponse('You are not logged in', 400));
 
-    const post = await Post.findById(req.params.id).populate('usersLiked');
+    const post = await Post.findById(req.params.id).select('usersLiked');
     if (!post) return next(new ErrorResponse('Post not found', 404));
 
     const like = post.usersLiked.find(
-      (userLiked) => userLiked._id.toString() === req.user._id.toString()
+      (userLiked) => userLiked.toString() === req.user._id.toString()
     );
     const favorites = user.favoritePosts.find(
       (favoritePost) => favoritePost.toString() === req.params.id.toString()
     );
 
-    if (like && favorites) {
-      // Remove post from favoritesPosts array
-      const userIndex = user.favoritePosts.indexOf(req.params.id);
-      if (userIndex >= 0) user.favoritePosts.splice(userIndex, 1);
-      // Remove like from usersLiked array
-      const postIndex = post.usersLiked.indexOf(req.user._id);
-      if (postIndex >= 0) post.usersLiked.splice(postIndex, 1);
-    } else {
+    if (!like && !favorites) {
       // Like the post
-      if (!like) post.usersLiked.push(req.user._id);
+      post.usersLiked.push(req.user._id);
       // Add to user favorites
-      if (!favorites) user.favoritePosts.push(req.params.id);
+      user.favoritePosts.push(req.params.id);
+    } else {
+      // Remove post from favoritePosts array
+      const postIndex = user.favoritePosts.indexOf(req.params.id);
+      if (postIndex >= 0) user.favoritePosts.splice(postIndex, 1);
+      // Remove like from usersLiked array
+      const likeIndex = post.usersLiked.indexOf(req.user._id);
+      if (likeIndex >= 0) post.usersLiked.splice(likeIndex, 1);
+      console.log(likeIndex);
     }
+
     await post.save();
     await user.save();
     res.status(200).json({ success: true, data: post });

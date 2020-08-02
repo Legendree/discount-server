@@ -28,15 +28,12 @@ const postSchema = new mongoose.Schema({
     required: [true, 'Please enter experation date for this sale'],
   },
   url: String,
-  usersLiked: {
-    type: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
-    select: false,
-  },
+  usersLiked: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      select: false,
+    },
+  ],
   likeCount: Number,
   alias: String,
   isPostLiked: {
