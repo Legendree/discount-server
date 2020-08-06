@@ -127,8 +127,9 @@ router.post(
 
         const message = {
           notification: {
-            title: 'New discounts',
-            body: `${storeName} and more of your favorite stores have new discounts`,
+            title: `${storeName}`,
+            body: `Check out this new discount`,
+            sound: 'true',
           },
         };
         const options = {
