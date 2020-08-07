@@ -184,10 +184,6 @@ router.post(
   '/resetpassword/:resettoken',
   asyncHandler(async (req, res, next) => {
     //Get reset password token
-    const resetPasswordToken = crypto
-      .createHash('sha256')
-      .update(req.params.resettoken)
-      .digest('hex');
 
     const user = await User.findOne({
       resetPasswordToken,
