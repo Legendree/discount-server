@@ -167,19 +167,14 @@ router.post(
         subject: 'Reset your password',
         html: htmlEmail,
       });
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpire = Date.now() + 10 * 60 * 100;
+      await user.save();
       res.json({
         success: true,
         data: 'Email sent.',
       });
-      user.resetPasswordToken = resetToken;
-      user.resetPasswordExpire = Date.now() + 10 * 60 * 100;
     } catch (error) {
-      //   console.log(error);
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpire = undefined;
-
-      await user.save();
-
       return next(new ErrorResponse('Email could not be sent.', 500));
     }
   })
