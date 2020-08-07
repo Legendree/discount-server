@@ -168,7 +168,7 @@ router.post(
         html: htmlEmail,
       });
       user.resetPasswordToken = resetToken;
-      user.resetPasswordExpire = Date.now() + 10 * 60 * 100;
+      user.resetPasswordExpire = Date.now() + 600000;
       await user.save();
       res.json({
         success: true,
@@ -185,16 +185,21 @@ router.post(
   asyncHandler(async (req, res, next) => {
     //Get reset password token
 
+    const { resettoken } = req.params;
+
     const user = await User.findOne({
-      resetPasswordToken,
+      resetPasswordToken: resettoken,
       resetPasswordExpire: { $gt: Date.now() },
-    });
+    }).select('password');
+
+    console.log(user);
     if (!user) return next(new ErrorResponse('Invalid reset password link'));
 
     //Set new password
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
+
     await user.save();
 
     sendTokenResponse(user, 200, res);
