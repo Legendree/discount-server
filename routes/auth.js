@@ -171,6 +171,8 @@ router.post(
         success: true,
         data: 'Email sent.',
       });
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpire = Date.now() + 10 * 60 * 100;
     } catch (error) {
       //   console.log(error);
       user.resetPasswordToken = undefined;
